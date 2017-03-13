@@ -33,7 +33,7 @@
 
 该系列文章将展示六种不同的DAO层实现方法并总结其不同，本章使用Spring-Data-JPA完成DAO操作。
 1. 示例代码：1) 在s">
-<meta property="og:updated_time" content="2017-03-13T09:35:31.076Z">
+<meta property="og:updated_time" content="2017-03-13T09:50:50.852Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="DAO层实现示例 六：Spring-Data-JPA">
 <meta name="twitter:description" content="项目地址：https://github.com/FateSolo/DAO-Test
@@ -144,14 +144,14 @@
 <p>3) 访问<a href="http://localhost:8080/book/name/Test，得到如下结果：" target="_blank" rel="external">http://localhost:8080/book/name/Test，得到如下结果：</a><br>[Book{id=1, name=’Test1’, author=’Fate’}, Book{id=2, name=’Test2’, author=’Fate’}, Book{id=3, name=’Test3’, author=’Fate’}, Book{id=4, name=’Test4’, author=’Fate’}, Book{id=5, name=’Test5’, author=’Fate’}, Book{id=6, name=’Test6’, author=’Fate’}]</p>
 <h3 id="3-__u603B_u7ED3"><a href="#3-__u603B_u7ED3" class="headerlink" title="3. 总结"></a>3. 总结</h3><p>就像Spring的JdbcTemplate是对原生Jdbc的封装，Spring-Data-JPA也是Spring对JPA的封装。</p>
 <p>可以看到，Spring-Data-JPA已经做到了简化的极致，开发者无需实现任何逻辑代码和sql语句，仅仅继承了BookDao接口并添加了@RepositoryDefinition注解 (或者继承org.springframework.data.repository.Repository及其子接口)，就完成了DAO的操作。</p>
-<p>Spring-Data-JPA是根据声明方法的命名来自动实现逻辑代码的，findById、findByNameContaining、save等都符合了其命名规则，开发者无需再自行实现。关于具体的命名规则，请参阅<a href="http://docs.spring.io/spring-data/jpa/docs/1.11.1.RELEASE/reference/html/" target="_blank" rel="external">Spring官方文档</a>。</p>
+<p>Spring-Data-JPA是根据声明方法的命名来自动实现逻辑代码的，findById、findByNameContaining、save等都符合了其命名规则，开发者无需再自行实现。关于具体的命名规则，请参阅<a href="http://docs.spring.io/spring-data/jpa/docs/1.11.1.RELEASE/reference/html/#repository-query-keywords" target="_blank" rel="external">Spring官方文档</a>。</p>
 <hr>
 <p>作者 [@FateSolo]<br>2017 年 03月 12日</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-6-SpringDataJPA/" data-id="cj07x0zlc00060ilargilgug7" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-6-SpringDataJPA/" data-id="cj07xikgf0006cvlar25zpztn" class="article-share-link">Share</a>
       
       
     </footer>
