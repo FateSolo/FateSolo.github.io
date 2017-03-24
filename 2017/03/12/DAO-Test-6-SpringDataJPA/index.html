@@ -33,7 +33,7 @@
 
 该系列文章将展示六种不同的DAO层实现方法并总结其不同，本章使用Spring-Data-JPA完成DAO操作。
 1. 示例代码：1) 在s">
-<meta property="og:updated_time" content="2017-03-16T09:19:55.807Z">
+<meta property="og:updated_time" content="2017-03-24T09:23:27.031Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="DAO层实现示例 六：Spring-Data-JPA">
 <meta name="twitter:description" content="项目地址：https://github.com/FateSolo/DAO-Test
@@ -142,10 +142,10 @@
 <p>2) 在build.gradle中，添加Spring-Data-JPA依赖：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">compile &#39;org.springframework.data:spring-data-jpa:1.11.1.RELEASE&#39;</span><br></pre></td></tr></table></figure></p>
 <p>3) 在dao.impl包中创建BookDaoSpringDataJpaImpl.java，编写如下代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.dao.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.fatesolo.dao.BookDao;</span><br><span class="line"><span class="keyword">import</span> com.fatesolo.entity.Book;</span><br><span class="line"><span class="keyword">import</span> org.springframework.data.repository.RepositoryDefinition;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Repository;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@Repository</span>(<span class="string">"bookDaoSpringDataJpaImpl"</span>)</span><br><span class="line"><span class="annotation">@RepositoryDefinition</span>(domainClass = Book.class, idClass = Integer.class)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BookDaoSpringDataJpaImpl</span> <span class="keyword">extends</span> <span class="title">BookDao</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>4) 打开BookService.java，修改成员变量bookDao的注解：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@Resource</span>(name = <span class="string">"bookDaoSpringDataJpaImpl"</span>)</span><br></pre></td></tr></table></figure></p>
-<h3 id="2-__u9879_u76EE_u8FD0_u884C_uFF1A"><a href="#2-__u9879_u76EE_u8FD0_u884C_uFF1A" class="headerlink" title="2. 项目运行："></a>2. 项目运行：</h3><p>1) 使用Tomcat 8运行项目，使用curl工具添加一条数据：<br>curl -d “name=Test6&amp;author=Fate” <a href="http://localhost:8080/book" target="_blank" rel="external">http://localhost:8080/book</a></p>
-<p>得到如下返回：<br>Book{id=6, name=’Test6’, author=’Fate’}</p>
-<p>2) 访问<a href="http://localhost:8080/book/6，得到如下结果：" target="_blank" rel="external">http://localhost:8080/book/6，得到如下结果：</a><br>Book{id=6, name=’Test6’, author=’Fate’}</p>
-<p>3) 访问<a href="http://localhost:8080/book/name/Test，得到如下结果：" target="_blank" rel="external">http://localhost:8080/book/name/Test，得到如下结果：</a><br>[Book{id=1, name=’Test1’, author=’Fate’}, Book{id=2, name=’Test2’, author=’Fate’}, Book{id=3, name=’Test3’, author=’Fate’}, Book{id=4, name=’Test4’, author=’Fate’}, Book{id=5, name=’Test5’, author=’Fate’}, Book{id=6, name=’Test6’, author=’Fate’}]</p>
+<h3 id="2-__u9879_u76EE_u8FD0_u884C_uFF1A"><a href="#2-__u9879_u76EE_u8FD0_u884C_uFF1A" class="headerlink" title="2. 项目运行："></a>2. 项目运行：</h3><p>1) 使用Tomcat 8运行项目，使用curl工具添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -d &#34;name=Test6&#38;author=Fate&#34; http://localhost:8080/book</span><br></pre></td></tr></table></figure></p>
+<p>得到如下返回：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book&#123;id=6, name=&#39;Test6&#39;, author=&#39;Fate&#39;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2) 访问<a href="http://localhost:8080/book/6" target="_blank" rel="external">http://localhost:8080/book/6</a> ，得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book&#123;id=6, name=&#39;Test6&#39;, author=&#39;Fate&#39;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3) 访问<a href="http://localhost:8080/book/name/Test" target="_blank" rel="external">http://localhost:8080/book/name/Test</a> ，得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Book&#123;id=1, name=&#39;Test1&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=2, name=&#39;Test2&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=3, name=&#39;Test3&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=4, name=&#39;Test4&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=5, name=&#39;Test5&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=6, name=&#39;Test6&#39;, author=&#39;Fate&#39;&#125;]</span><br></pre></td></tr></table></figure></p>
 <h3 id="3-__u603B_u7ED3"><a href="#3-__u603B_u7ED3" class="headerlink" title="3. 总结"></a>3. 总结</h3><p>就像Spring的JdbcTemplate是对原生Jdbc的封装，Spring-Data-JPA也是Spring对JPA的封装。</p>
 <p>可以看到，Spring-Data-JPA已经做到了简化的极致，开发者无需实现任何逻辑代码和sql语句，仅仅继承了BookDao接口并添加了@RepositoryDefinition注解 (或者继承org.springframework.data.repository.Repository及其子接口)，就完成了DAO的操作。</p>
 <p>Spring-Data-JPA是根据声明方法的命名来自动实现逻辑代码的，findById、findByNameContaining、save等都符合了其命名规则，开发者无需再自行实现。关于具体的命名规则，请参阅<a href="http://docs.spring.io/spring-data/jpa/docs/1.11.1.RELEASE/reference/html/#repository-query-keywords" target="_blank" rel="external">Spring官方文档</a>。</p>
@@ -155,16 +155,25 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-6-SpringDataJPA/" data-id="cj0c6qjkl000m9llaogvksza3" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-6-SpringDataJPA/" data-id="cj0nmifgd00117wla9p7e6xc7" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/DAO系列/">DAO系列</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li></ul>
 
     </footer>
   </div>
   
     
 <nav id="article-nav">
+  
+    <a href="/2017/03/22/JSH-Test-1-Jersey/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          JAX-RS初探 一：搭建Jersey框架
+        
+      </div>
+    </a>
   
   
     <a href="/2017/03/12/DAO-Test-5-JPA/" id="article-nav-older" class="article-nav-link-wrap">
@@ -185,7 +194,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/DAO系列/">DAO系列</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SSM框架/">SSM框架</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/五子棋/">五子棋</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/DAO系列/">DAO系列</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAX-RS系列/">JAX-RS系列</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SSM框架/">SSM框架</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/五子棋/">五子棋</a></li></ul>
     </div>
   </div>
 
@@ -195,7 +204,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/DAO系列/">DAO系列</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SSM框架/">SSM框架</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hibernate/">Hibernate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JPA/">JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jdbc/">Jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JdbcTemplate/">JdbcTemplate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
     </div>
   </div>
 
@@ -205,7 +214,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/DAO系列/" style="font-size: 20px;">DAO系列</a> <a href="/tags/SSM框架/" style="font-size: 10px;">SSM框架</a> <a href="/tags/五子棋/" style="font-size: 10px;">五子棋</a>
+      <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 10px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 10px;">Jersey</a> <a href="/tags/Mybatis/" style="font-size: 20px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 10px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 20px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 15px;">五子棋</a>
     </div>
   </div>
 
@@ -227,23 +236,23 @@
       <ul>
         
           <li>
+            <a href="/2017/03/22/JSH-Test-3-Other/">JSH-Test-3-Other</a>
+          </li>
+        
+          <li>
+            <a href="/2017/03/22/JSH-Test-2-Spring/">JSH-Test-2-Spring</a>
+          </li>
+        
+          <li>
+            <a href="/2017/03/22/JSH-Test-1-Jersey/">JAX-RS初探 一：搭建Jersey框架</a>
+          </li>
+        
+          <li>
             <a href="/2017/03/12/DAO-Test-6-SpringDataJPA/">DAO层实现示例 六：Spring-Data-JPA</a>
           </li>
         
           <li>
             <a href="/2017/03/12/DAO-Test-5-JPA/">DAO层实现示例 五：JPA</a>
-          </li>
-        
-          <li>
-            <a href="/2017/03/12/DAO-Test-4-Hibernate/">DAO层实现示例 四：Hibernate框架</a>
-          </li>
-        
-          <li>
-            <a href="/2017/03/12/DAO-Test-3-Mybatis/">DAO层实现示例 三：Mybatis框架</a>
-          </li>
-        
-          <li>
-            <a href="/2017/03/12/DAO-Test-2-JdbcTemplate/">DAO层实现示例 二：JdbcTemplate</a>
           </li>
         
       </ul>

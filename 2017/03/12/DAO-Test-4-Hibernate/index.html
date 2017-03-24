@@ -33,7 +33,7 @@
 
 该系列文章将展示六种不同的DAO层实现方法并总结其不同，本章使用Hibernate框架完成DAO操作。
 1. 示例代码：1) 在sprin">
-<meta property="og:updated_time" content="2017-03-16T09:19:46.079Z">
+<meta property="og:updated_time" content="2017-03-24T09:21:48.195Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="DAO层实现示例 四：Hibernate框架">
 <meta name="twitter:description" content="项目地址：https://github.com/FateSolo/DAO-Test
@@ -142,10 +142,10 @@
 <p>3) 在dao.impl包中创建BookDaoHibernateImpl.java，编写如下代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.dao.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.fatesolo.dao.BookDao;</span><br><span class="line"><span class="keyword">import</span> com.fatesolo.entity.Book;</span><br><span class="line"><span class="keyword">import</span> org.hibernate.SessionFactory;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Repository;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.annotation.Resource;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@Repository</span>(<span class="string">"bookDaoHibernateImpl"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BookDaoHibernateImpl</span> <span class="keyword">implements</span> <span class="title">BookDao</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> SessionFactory sessionFactory;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Book <span class="title">findById</span><span class="params">(<span class="keyword">int</span> id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sessionFactory.getCurrentSession().get(Book.class, id);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Book&gt; <span class="title">findByNameContaining</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sessionFactory.getCurrentSession()</span><br><span class="line">                .createQuery(<span class="string">"from Book where name like ?"</span>, Book.class)</span><br><span class="line">                .setParameter(<span class="number">0</span>, <span class="string">"%"</span> + name + <span class="string">"%"</span>)</span><br><span class="line">                .list();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">save</span><span class="params">(Book book)</span> </span>&#123;</span><br><span class="line">        sessionFactory.getCurrentSession().save(book);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>4) 打开Book.java，修改代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.entity;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.persistence.*;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@Entity</span></span><br><span class="line"><span class="annotation">@Table</span>(name = <span class="string">"book"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Id</span></span><br><span class="line">    <span class="annotation">@GeneratedValue</span>(strategy = GenerationType.IDENTITY)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Column</span>(nullable = <span class="keyword">false</span>)</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Column</span>(nullable = <span class="keyword">false</span>)</span><br><span class="line">    <span class="keyword">private</span> String author;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">(<span class="keyword">int</span> id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.id = id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getAuthor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> author;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAuthor</span><span class="params">(String author)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.author = author;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"Book&#123;"</span> +</span><br><span class="line">                <span class="string">"id="</span> + id +</span><br><span class="line">                <span class="string">", name='"</span> + name + <span class="string">'\''</span> +</span><br><span class="line">                <span class="string">", author='"</span> + author + <span class="string">'\''</span> +</span><br><span class="line">                <span class="string">'&#125;'</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>5) 打开BookService.java，修改成员变量bookDao的注解：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@Resource</span>(name = <span class="string">"bookDaoHibernateImpl"</span>)</span><br></pre></td></tr></table></figure></p>
-<h3 id="2-__u9879_u76EE_u8FD0_u884C_uFF1A"><a href="#2-__u9879_u76EE_u8FD0_u884C_uFF1A" class="headerlink" title="2. 项目运行："></a>2. 项目运行：</h3><p>1) 使用Tomcat 8运行项目，使用curl工具添加一条数据：<br>curl -d “name=Test4&amp;author=Fate” <a href="http://localhost:8080/book" target="_blank" rel="external">http://localhost:8080/book</a></p>
-<p>得到如下返回：<br>Book{id=4, name=’Test4’, author=’Fate’}</p>
-<p>2) 访问<a href="http://localhost:8080/book/4，得到如下结果：" target="_blank" rel="external">http://localhost:8080/book/4，得到如下结果：</a><br>Book{id=4, name=’Test4’, author=’Fate’}</p>
-<p>3) 访问<a href="http://localhost:8080/book/name/Test，得到如下结果：" target="_blank" rel="external">http://localhost:8080/book/name/Test，得到如下结果：</a><br>[Book{id=1, name=’Test1’, author=’Fate’}, Book{id=2, name=’Test2’, author=’Fate’}, Book{id=3, name=’Test3’, author=’Fate’}, Book{id=4, name=’Test4’, author=’Fate’}]</p>
+<h3 id="2-__u9879_u76EE_u8FD0_u884C_uFF1A"><a href="#2-__u9879_u76EE_u8FD0_u884C_uFF1A" class="headerlink" title="2. 项目运行："></a>2. 项目运行：</h3><p>1) 使用Tomcat 8运行项目，使用curl工具添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -d &#34;name=Test4&#38;author=Fate&#34; http://localhost:8080/book</span><br></pre></td></tr></table></figure></p>
+<p>得到如下返回：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book&#123;id=4, name=&#39;Test4&#39;, author=&#39;Fate&#39;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2) 访问<a href="http://localhost:8080/book/4" target="_blank" rel="external">http://localhost:8080/book/4</a> ，得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book&#123;id=4, name=&#39;Test4&#39;, author=&#39;Fate&#39;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3) 访问<a href="http://localhost:8080/book/name/Test" target="_blank" rel="external">http://localhost:8080/book/name/Test</a> ，得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Book&#123;id=1, name=&#39;Test1&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=2, name=&#39;Test2&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=3, name=&#39;Test3&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=4, name=&#39;Test4&#39;, author=&#39;Fate&#39;&#125;]</span><br></pre></td></tr></table></figure></p>
 <h3 id="3-__u603B_u7ED3"><a href="#3-__u603B_u7ED3" class="headerlink" title="3. 总结"></a>3. 总结</h3><p>Hibernate是经典的ORM框架，使用Hibernate，彻底完成了实体与表的映射，开发者无需再编写sql (某些情况下仍需要编写少量的hql语句)。</p>
 <hr>
 <p>作者 [@FateSolo]<br>2017 年 03月 12日</p>
@@ -153,10 +153,10 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-4-Hibernate/" data-id="cj0c6qjkv000s9llam4hlnuki" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-4-Hibernate/" data-id="cj0nmifgo00197wlaxf6fqzxv" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/DAO系列/">DAO系列</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hibernate/">Hibernate</a></li></ul>
 
     </footer>
   </div>
@@ -192,7 +192,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/DAO系列/">DAO系列</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SSM框架/">SSM框架</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/五子棋/">五子棋</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/DAO系列/">DAO系列</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAX-RS系列/">JAX-RS系列</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SSM框架/">SSM框架</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/五子棋/">五子棋</a></li></ul>
     </div>
   </div>
 
@@ -202,7 +202,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/DAO系列/">DAO系列</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SSM框架/">SSM框架</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hibernate/">Hibernate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JPA/">JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jdbc/">Jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JdbcTemplate/">JdbcTemplate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
     </div>
   </div>
 
@@ -212,7 +212,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/DAO系列/" style="font-size: 20px;">DAO系列</a> <a href="/tags/SSM框架/" style="font-size: 10px;">SSM框架</a> <a href="/tags/五子棋/" style="font-size: 10px;">五子棋</a>
+      <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 10px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 10px;">Jersey</a> <a href="/tags/Mybatis/" style="font-size: 20px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 10px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 20px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 15px;">五子棋</a>
     </div>
   </div>
 
@@ -234,23 +234,23 @@
       <ul>
         
           <li>
+            <a href="/2017/03/22/JSH-Test-3-Other/">JSH-Test-3-Other</a>
+          </li>
+        
+          <li>
+            <a href="/2017/03/22/JSH-Test-2-Spring/">JSH-Test-2-Spring</a>
+          </li>
+        
+          <li>
+            <a href="/2017/03/22/JSH-Test-1-Jersey/">JAX-RS初探 一：搭建Jersey框架</a>
+          </li>
+        
+          <li>
             <a href="/2017/03/12/DAO-Test-6-SpringDataJPA/">DAO层实现示例 六：Spring-Data-JPA</a>
           </li>
         
           <li>
             <a href="/2017/03/12/DAO-Test-5-JPA/">DAO层实现示例 五：JPA</a>
-          </li>
-        
-          <li>
-            <a href="/2017/03/12/DAO-Test-4-Hibernate/">DAO层实现示例 四：Hibernate框架</a>
-          </li>
-        
-          <li>
-            <a href="/2017/03/12/DAO-Test-3-Mybatis/">DAO层实现示例 三：Mybatis框架</a>
-          </li>
-        
-          <li>
-            <a href="/2017/03/12/DAO-Test-2-JdbcTemplate/">DAO层实现示例 二：JdbcTemplate</a>
           </li>
         
       </ul>
