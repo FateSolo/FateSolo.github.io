@@ -3,18 +3,42 @@
 <head>
   <meta charset="utf-8">
   
-  <title>JSH-Test-3-Other | Fate Solo</title>
+  <title>JAX-RS初探 三：其他 | Fate Solo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Fate&apos;s Home">
+  <meta name="description" content="项目地址：https://github.com/FateSolo/JSH-Test
+目录：
+1. 搭建Jerysey框架
+2. 整合Spring+Spring-Data-JPA
+3. 其他
+
+本章继续对JAX-RS予以补充。
+1. 整合Logback日志关于日志你有多种选择，这里我选择使用Logback来代替此前一直使用的Log4j，关于它们二者的对比可以参阅网上的其他资料。
+1) 打开web.x">
 <meta property="og:type" content="article">
-<meta property="og:title" content="JSH-Test-3-Other">
+<meta property="og:title" content="JAX-RS初探 三：其他">
 <meta property="og:url" content="http://yoursite.com/2017/03/22/JSH-Test-3-Other/index.html">
 <meta property="og:site_name" content="Fate Solo">
-<meta property="og:description" content="Fate&apos;s Home">
-<meta property="og:updated_time" content="2017-03-22T05:45:24.440Z">
+<meta property="og:description" content="项目地址：https://github.com/FateSolo/JSH-Test
+目录：
+1. 搭建Jerysey框架
+2. 整合Spring+Spring-Data-JPA
+3. 其他
+
+本章继续对JAX-RS予以补充。
+1. 整合Logback日志关于日志你有多种选择，这里我选择使用Logback来代替此前一直使用的Log4j，关于它们二者的对比可以参阅网上的其他资料。
+1) 打开web.x">
+<meta property="og:updated_time" content="2017-03-26T09:19:22.090Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="JSH-Test-3-Other">
-<meta name="twitter:description" content="Fate&apos;s Home">
+<meta name="twitter:title" content="JAX-RS初探 三：其他">
+<meta name="twitter:description" content="项目地址：https://github.com/FateSolo/JSH-Test
+目录：
+1. 搭建Jerysey框架
+2. 整合Spring+Spring-Data-JPA
+3. 其他
+
+本章继续对JAX-RS予以补充。
+1. 整合Logback日志关于日志你有多种选择，这里我选择使用Logback来代替此前一直使用的Log4j，关于它们二者的对比可以参阅网上的其他资料。
+1) 打开web.x">
   
     <link rel="alternate" href="/atom.xml" title="Fate Solo" type="application/atom+xml">
   
@@ -68,9 +92,13 @@
         <section id="main"><article id="post-JSH-Test-3-Other" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/03/22/JSH-Test-3-Other/" class="article-date">
-  <time datetime="2017-03-22T05:45:24.000Z" itemprop="datePublished">2017-03-22</time>
+  <time datetime="2017-03-22T07:57:32.000Z" itemprop="datePublished">2017-03-22</time>
 </a>
     
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/JAX-RS系列/">JAX-RS系列</a>
+  </div>
+
   </div>
   <div class="article-inner">
     
@@ -79,7 +107,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      JSH-Test-3-Other
+      JAX-RS初探 三：其他
     </h1>
   
 
@@ -87,13 +115,55 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <hr>
+<p>项目地址：<br><a href="https://github.com/FateSolo/JSH-Test" target="_blank" rel="external">https://github.com/FateSolo/JSH-Test</a></p>
+<h3 id="u76EE_u5F55_uFF1A"><a href="#u76EE_u5F55_uFF1A" class="headerlink" title="目录："></a>目录：</h3><ul>
+<li><a href="/2017/03/22/JSH-Test-1-Jersey/">1. 搭建Jerysey框架</a></li>
+<li><a href="/2017/03/22/JSH-Test-2-Spring/">2. 整合Spring+Spring-Data-JPA</a></li>
+<li><a href="/2017/03/22/JSH-Test-3-Other/">3. 其他</a></li>
+</ul>
+<p>本章继续对JAX-RS予以补充。</p>
+<h3 id="1-__u6574_u5408Logback_u65E5_u5FD7"><a href="#1-__u6574_u5408Logback_u65E5_u5FD7" class="headerlink" title="1. 整合Logback日志"></a>1. 整合Logback日志</h3><p>关于日志你有多种选择，这里我选择使用Logback来代替此前一直使用的Log4j，关于它们二者的对比可以参阅网上的其他资料。</p>
+<p>1) 打开web.xml，添加如下配置：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- Logback --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">context-param</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">param-name</span>&gt;</span>logbackConfigLocation<span class="tag">&lt;/<span class="title">param-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">param-value</span>&gt;</span>classpath:config/log/logback.xml<span class="tag">&lt;/<span class="title">param-value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">context-param</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">listener</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">listener-class</span>&gt;</span>ch.qos.logback.ext.spring.web.LogbackConfigListener<span class="tag">&lt;/<span class="title">listener-class</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">listener</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>2) 添加Logback依赖：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/**&#10; * Logback&#10; */&#10;compile &#39;ch.qos.logback:logback-classic:1.2.1&#39;&#10;compile &#39;org.logback-extensions:logback-ext-spring:0.1.4&#39;&#10;compile &#39;org.slf4j:jcl-over-slf4j:1.7.22&#39;</span><br></pre></td></tr></table></figure></p>
+<p>三个依赖依次是Logback(包括Logback本身的实现与slf4j接口)、Logback对Spring的支持、Apache Commons Logging到slf4j的桥接器(因为Spring大量使用了Apache Commons Logging接口，所以需要重定向到slf4j接口)</p>
+<p>3) 在resources/config/log目录下创建Logback日志的配置文件logback.xml：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="pi">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">configuration</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">description</span>&gt;</span>Logback 日志配置<span class="tag">&lt;/<span class="title">description</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">appender</span> <span class="attribute">name</span>=<span class="value">"STDOUT"</span> <span class="attribute">class</span>=<span class="value">"ch.qos.logback.core.ConsoleAppender"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">encoder</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">pattern</span>&gt;</span>%d&#123;HH:mm:ss.SSS&#125; [%thread] %-5level %logger&#123;80&#125; - %msg%n<span class="tag">&lt;/<span class="title">pattern</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="title">encoder</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">appender</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">appender</span> <span class="attribute">name</span>=<span class="value">"FILE"</span> <span class="attribute">class</span>=<span class="value">"ch.qos.logback.core.rolling.RollingFileAppender"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">rollingPolicy</span> <span class="attribute">class</span>=<span class="value">"ch.qos.logback.core.rolling.TimeBasedRollingPolicy"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">fileNamePattern</span>&gt;</span>$&#123;JSH-Test.root&#125;/WEB-INF/logs/%d&#123;yyyy-MM&#125;/%d&#123;yyyy-MM-dd&#125;.log<span class="tag">&lt;/<span class="title">fileNamePattern</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">maxHistory</span>&gt;</span>500<span class="tag">&lt;/<span class="title">maxHistory</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="title">rollingPolicy</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="title">encoder</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">pattern</span>&gt;</span>%d&#123;HH:mm:ss.SSS&#125; [%thread] %-5level %logger&#123;80&#125; - %msg%n<span class="tag">&lt;/<span class="title">pattern</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="title">encoder</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">appender</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">root</span> <span class="attribute">level</span>=<span class="value">"DEBUG"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">appender-ref</span> <span class="attribute">ref</span>=<span class="value">"STDOUT"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">appender-ref</span> <span class="attribute">ref</span>=<span class="value">"FILE"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">root</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="title">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="2-__u4F7FJersey_u652F_u6301_u8FD4_u56DEjson"><a href="#2-__u4F7FJersey_u652F_u6301_u8FD4_u56DEjson" class="headerlink" title="2. 使Jersey支持返回json"></a>2. 使Jersey支持返回json</h3><p>在前两章的示例中，我们使用@Consumes和@Produces限制了Content-Type和Accept的类型仅支持Application/xml格式，然后在实体类Book上增加了@XmlRootElement注解，此后Jersey框架会自动使用Java自带的JAXB为我们进行实体到xml数据的转换。</p>
+<p>但一个RESTful服务，通常情况下会使用更为轻便简洁的json格式来进行数据的交换，而Java却没有默认支json的转换，因此我们需要手动添加支持(这里选择了Gson做为实现)，使得Jersey完成对json格式的数据转换。</p>
+<p>1) 添加Gson依赖：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/**&#10; * Druid&#10; */&#10;compile &#39;com.alibaba:druid:1.0.28&#39;&#10;&#10;2) &#24314;&#31435;provider&#23376;&#21253;&#65292;&#24182;&#21019;&#24314;GsonProvider&#31867;&#65306;&#10;```java&#10;package com.fatesolo.jsh.provider;&#10;&#10;import com.google.gson.Gson;&#10;import com.google.gson.GsonBuilder;&#10;&#10;import javax.ws.rs.Consumes;&#10;import javax.ws.rs.Produces;&#10;import javax.ws.rs.WebApplicationException;&#10;import javax.ws.rs.core.MediaType;&#10;import javax.ws.rs.core.MultivaluedMap;&#10;import javax.ws.rs.ext.MessageBodyReader;&#10;import javax.ws.rs.ext.MessageBodyWriter;&#10;import javax.ws.rs.ext.Provider;&#10;import java.io.*;&#10;import java.lang.annotation.Annotation;&#10;import java.lang.reflect.Type;&#10;&#10;@Provider&#10;@Consumes(MediaType.APPLICATION_JSON)&#10;@Produces(MediaType.APPLICATION_JSON)&#10;public class GsonProvider implements MessageBodyWriter&#60;Object&#62;, MessageBodyReader&#60;Object&#62; &#123;&#10;&#10;    private final Gson gson;&#10;&#10;    public GsonProvider() &#123;&#10;        gson = new GsonBuilder().disableHtmlEscaping().create();&#10;    &#125;&#10;&#10;    @Override&#10;    public boolean isReadable(Class&#60;?&#62; type, Type genericType,&#10;                              Annotation[] annotations, MediaType mediaType) &#123;&#10;        return true;&#10;    &#125;&#10;&#10;    @Override&#10;    public Object readFrom(Class&#60;Object&#62; type, Type genericType,&#10;                           Annotation[] annotations, MediaType mediaType,&#10;                           MultivaluedMap&#60;String, String&#62; httpHeaders,&#10;                           InputStream entityStream) throws IOException, WebApplicationException &#123;&#10;        try (InputStreamReader reader = new InputStreamReader(entityStream, &#34;UTF-8&#34;)) &#123;&#10;            return gson.fromJson(reader, type.equals(genericType) ? type : genericType);&#10;        &#125;&#10;    &#125;&#10;&#10;    @Override&#10;    public boolean isWriteable(Class&#60;?&#62; type, Type genericType,&#10;                               Annotation[] annotations, MediaType mediaType) &#123;&#10;        return true;&#10;    &#125;&#10;&#10;    @Override&#10;    public long getSize(Object object, Class&#60;?&#62; type, Type genericType,&#10;                        Annotation[] annotations, MediaType mediaType) &#123;&#10;        return -1;&#10;    &#125;&#10;&#10;    @Override&#10;    public void writeTo(Object object, Class&#60;?&#62; type, Type genericType,&#10;                        Annotation[] annotations, MediaType mediaType,&#10;                        MultivaluedMap&#60;String, Object&#62; httpHeaders,&#10;                        OutputStream entityStream) throws IOException, WebApplicationException &#123;&#10;        try (OutputStreamWriter writer = new OutputStreamWriter(entityStream, &#34;UTF-8&#34;)) &#123;&#10;            gson.toJson(object, type.equals(genericType) ? type : genericType, writer);&#10;        &#125;&#10;    &#125;&#10;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3) 与资源类一样，若想被Jersey使用，需要在Application类中注册：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">register(GsonProvider.class);</span><br></pre></td></tr></table></figure></p>
+<p>4) 修改BookResource中的@Consumes和@Produces，增加对json格式的支持：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@Controller</span></span><br><span class="line"><span class="annotation">@Path</span>(<span class="string">"/book"</span>)</span><br><span class="line"><span class="annotation">@Consumes</span>(&#123;MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON&#125;)</span><br><span class="line"><span class="annotation">@Produces</span>(&#123;MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON&#125;)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BookResource</span> </span>&#123;</span><br></pre></td></tr></table></figure></p>
+<h3 id="3-__u9879_u76EE_u8FD0_u884C_uFF1A"><a href="#3-__u9879_u76EE_u8FD0_u884C_uFF1A" class="headerlink" title="3. 项目运行："></a>3. 项目运行：</h3><p>1) 使用Tomcat 8运行项目，使用curl工具添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -H &#34;Content-Type:application/json&#34; -H &#34;Accept:application/json&#34; -d &#34;&#123;\&#34;name\&#34;:\&#34;Book2\&#34;,\&#34;author\&#34;:\&#34;Solo\&#34;&#125;&#34; http://localhost:8080/rest/book</span><br></pre></td></tr></table></figure></p>
+<p>得到如下返回：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;"<span class="attribute">code</span>":<span class="value"><span class="string">"SUCCESS"</span></span>&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2) 使用curl工具获取一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -H &#34;Accept:application/json&#34; http://localhost:8080/rest/book/2</span><br></pre></td></tr></table></figure></p>
+<p>得到如下结果：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;"<span class="attribute">id</span>":<span class="value"><span class="number">2</span></span>,"<span class="attribute">name</span>":<span class="value"><span class="string">"Book2"</span></span>,"<span class="attribute">author</span>":<span class="value"><span class="string">"Solo"</span></span>&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3) 使用curl工具获取所有数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -H &#34;Accept:application/json&#34; http://localhost:8080/rest/book</span><br></pre></td></tr></table></figure></p>
+<p>得到如下结果：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[&#123;"<span class="attribute">id</span>":<span class="value"><span class="number">1</span></span>,"<span class="attribute">name</span>":<span class="value"><span class="string">"Book"</span></span>,"<span class="attribute">author</span>":<span class="value"><span class="string">"Fate"</span></span>&#125;,&#123;"<span class="attribute">id</span>":<span class="value"><span class="number">2</span></span>,"<span class="attribute">name</span>":<span class="value"><span class="string">"Book2"</span></span>,"<span class="attribute">author</span>":<span class="value"><span class="string">"Solo"</span></span>&#125;]</span><br></pre></td></tr></table></figure></p>
+<p>至此，Jersey已经支持了对json格式数据的转换。</p>
+<h3 id="4-__u5173_u4E8ESpringMVC_u7684_u6570_u636E_u8F6C_u6362"><a href="#4-__u5173_u4E8ESpringMVC_u7684_u6570_u636E_u8F6C_u6362" class="headerlink" title="4. 关于SpringMVC的数据转换"></a>4. 关于SpringMVC的数据转换</h3><p>可以看到，当一个方法直接返回实体或包装它的数据结构时，JAX-RS会依据Accept的类型自动完成转换来返回相对应的类型，同理也会依据Content-Type的类型来自动完成请求数据到实体对象的绑定。</p>
+<p>在此前使用SpringMVC中，我基本都是直接返回String类型，然后使用Gson的toJson方法手动完成转换，事实上SpringMVC的数据转换同样非常方便：</p>
+<p>1) 当我们在spring-mvc.xml增加了如下配置后，SpringMVC会自动注册相应的数据转换器，其中就包括了xml和json的转换器。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">mvc:annotation-driven</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>2) 但与Jersey类似，SpringMVC直接使用JAXB完成对xml的转换，而json则需要手动添加实现，这里仍以Gson示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">compile &#39;com.google.code.gson:gson:2.7&#39;</span><br></pre></td></tr></table></figure></p>
+<p>3) 在实体类上增加注解：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@XmlRootElement</span></span><br></pre></td></tr></table></figure></p>
+<p>4) 在Controller类中，没有专门的@Consumes和@Produces注解，而是在@RequestMapping中完成配置：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@RequestMapping</span>(path = <span class="string">"/&#123;id&#125;"</span>, method = RequestMethod.GET, produces = <span class="string">"application/xml"</span>)</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@RequestMapping</span>(path = <span class="string">"/name/&#123;name&#125;"</span>, method = RequestMethod.GET, produces = <span class="string">"application/json"</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@RequestMapping</span>(path = <span class="string">""</span>, method = RequestMethod.POST, consumes = <span class="string">"application/json"</span>)</span><br></pre></td></tr></table></figure>
+<p>至此，当返回类型是实体类或是包装其的数据结构时，SpringMVC会依据Content-Type和Accept自动完成数据的转换，比Jersey方便的一点是，SpringMVC直接支持操作Gson，而不再需要我们手动编写GsonProvider。</p>
+<h3 id="5-__u5173_u4E8E@Repository_u548C@RepositoryDefinition"><a href="#5-__u5173_u4E8E@Repository_u548C@RepositoryDefinition" class="headerlink" title="5. 关于@Repository和@RepositoryDefinition"></a>5. 关于@Repository和@RepositoryDefinition</h3><p>在DAO系列的Spring-Data-JPA一章中的BookDaoSpringDataJpaImpl接口中，同时使用了@Repository和@RepositoryDefinition注解，而在本系列的BookRepository接口中则只使用了@RepositoryDefinition注解。</p>
+<p>事实上使用@RepositoryDefinition便已完成了bean的注册，无需再使用@Repository注解。</p>
+<p>Mybatis框架里声明的接口同样不需要再使用@Repository注解，但在service层注入时，Intellij IDEA会报错(事实上可以完成注入)。</p>
+<p>为了看起来比较统一，DAO系列的六种实现都添加了@Repository注解，而Mybatis和Spring-Data-JPA两种方法增加与否并没有什么太大区别(区别就是上面提到的IDE错误)。</p>
+<hr>
+<p>作者 [@FateSolo]<br>2017 年 03月 22日</p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-3-Other/" data-id="cj0o5kvw5000k95lagaxicpqw" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-3-Other/" data-id="cj0qh4mjy000kojlaodicrimt" class="article-share-link">Share</a>
       
       
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Logback/">Logback</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li></ul>
+
     </footer>
   </div>
   
@@ -103,7 +173,7 @@
   
     <a href="/2017/03/22/JSH-Test-2-Spring/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">JAX-RS初探 二： 整合Spring + Spring-Data-JPA</div>
+      <div class="article-nav-title">JAX-RS初探 二：整合Spring + Spring-Data-JPA</div>
     </a>
   
 </nav>
@@ -129,7 +199,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hibernate/">Hibernate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JPA/">JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jdbc/">Jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JdbcTemplate/">JdbcTemplate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hibernate/">Hibernate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JPA/">JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jdbc/">Jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JdbcTemplate/">JdbcTemplate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logback/">Logback</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
     </div>
   </div>
 
@@ -139,7 +209,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 13.33px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 13.33px;">Jersey</a> <a href="/tags/Mybatis/" style="font-size: 16.67px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 13.33px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 16.67px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 13.33px;">五子棋</a>
+      <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 16.67px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 16.67px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Mybatis/" style="font-size: 16.67px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 13.33px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 20px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 13.33px;">五子棋</a>
     </div>
   </div>
 
@@ -161,11 +231,11 @@
       <ul>
         
           <li>
-            <a href="/2017/03/22/JSH-Test-3-Other/">JSH-Test-3-Other</a>
+            <a href="/2017/03/22/JSH-Test-3-Other/">JAX-RS初探 三：其他</a>
           </li>
         
           <li>
-            <a href="/2017/03/22/JSH-Test-2-Spring/">JAX-RS初探 二： 整合Spring + Spring-Data-JPA</a>
+            <a href="/2017/03/22/JSH-Test-2-Spring/">JAX-RS初探 二：整合Spring + Spring-Data-JPA</a>
           </li>
         
           <li>
