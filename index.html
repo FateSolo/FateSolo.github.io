@@ -125,19 +125,21 @@
 <p>3) 在实体类上增加注解：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@XmlRootElement</span></span><br></pre></td></tr></table></figure></p>
 <p>4) 在Controller类中，没有专门的@Consumes和@Produces注解，而是在@RequestMapping中完成配置：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@RequestMapping</span>(path = <span class="string">"/&#123;id&#125;"</span>, method = RequestMethod.GET, produces = <span class="string">"application/xml"</span>)</span><br></pre></td></tr></table></figure></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@RequestMapping</span>(path = <span class="string">"/name/&#123;name&#125;"</span>, method = RequestMethod.GET, produces = <span class="string">"application/json"</span>)</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@RequestMapping</span>(path = <span class="string">""</span>, method = RequestMethod.POST, consumes = <span class="string">"application/json"</span>)</span><br></pre></td></tr></table></figure>
+<p>produces代表了可以返回的类型，也可以使用{}返回多种类型。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@RequestMapping</span>(path = <span class="string">""</span>, method = RequestMethod.POST, consumes = <span class="string">"application/json"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> Book <span class="title">addBook</span><span class="params">(@RequestBody Book book)</span> </span>&#123;</span><br></pre></td></tr></table></figure>
+<p>consumes代表支持的请求类型，与produces的语法相同，另外需要在实体前增加@RequestBody注解，以支持json、xml等数据到实体的转换。</p>
 <p>至此，当返回类型是实体类或是包装其的数据结构时，SpringMVC会依据Content-Type和Accept自动完成数据的转换，比Jersey方便的一点是，SpringMVC直接支持操作Gson，而不再需要我们手动编写GsonProvider。</p>
 <h3 id="5-__u5173_u4E8E@Repository_u548C@RepositoryDefinition"><a href="#5-__u5173_u4E8E@Repository_u548C@RepositoryDefinition" class="headerlink" title="5. 关于@Repository和@RepositoryDefinition"></a>5. 关于@Repository和@RepositoryDefinition</h3><p>在DAO系列的Spring-Data-JPA一章中的BookDaoSpringDataJpaImpl接口中，同时使用了@Repository和@RepositoryDefinition注解，而在本系列的BookRepository接口中则只使用了@RepositoryDefinition注解。</p>
 <p>事实上使用@RepositoryDefinition便已完成了bean的注册，无需再使用@Repository注解。</p>
 <p>Mybatis框架里声明的接口同样不需要再使用@Repository注解，但在service层注入时，Intellij IDEA会报错(事实上可以完成注入)。</p>
-<p>为了看起来比较统一，DAO系列的六种实现都添加了@Repository注解，而Mybatis和Spring-Data-JPA两种方法增加与否并没有什么太大区别(区别就是上面提到的IDE错误)。</p>
+<p>为了看起来统一，DAO系列的六种实现都添加了@Repository注解，而Mybatis和Spring-Data-JPA两种方法增加与否并没有什么太大区别(区别就是上面提到的IDE报错)。</p>
 <hr>
 <p>作者 [@FateSolo]<br>2017 年 03月 22日</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-3-Other/" data-id="cj0qhjfz3000k44lagos134y9" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-3-Other/" data-id="cj17naz7u000kw4lavfv3ap1d" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Logback/">Logback</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li></ul>
@@ -208,7 +210,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-2-Spring/" data-id="cj0qhjfzv000u44laoy3gbz5k" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-2-Spring/" data-id="cj17naz82000uw4lakq538jye" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li></ul>
@@ -284,7 +286,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-1-Jersey/" data-id="cj0qhjg00001144la1ap6mnb4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-1-Jersey/" data-id="cj17naz890011w4lanjl5oryq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jersey/">Jersey</a></li></ul>
@@ -353,7 +355,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-6-SpringDataJPA/" data-id="cj0qhjg0o001d44la6s90z2od" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-6-SpringDataJPA/" data-id="cj17naz8p001dw4lajpmqedwu" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li></ul>
@@ -419,7 +421,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-5-JPA/" data-id="cj0qhjg0u001g44laq5aefw6k" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-5-JPA/" data-id="cj17naz8t001gw4la1x6wds7m" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JPA/">JPA</a></li></ul>
@@ -486,7 +488,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-4-Hibernate/" data-id="cj0qhjg0z001k44lairoo05cq" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-4-Hibernate/" data-id="cj17naz8x001kw4la7ap0iqry" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hibernate/">Hibernate</a></li></ul>
@@ -553,7 +555,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-3-Mybatis/" data-id="cj0qhjg16001o44lat7j7r0f1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-3-Mybatis/" data-id="cj17naz90001ow4lalp40xlsj" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Mybatis/">Mybatis</a></li></ul>
@@ -618,7 +620,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-2-JdbcTemplate/" data-id="cj0qhjg1c001r44la7qn4kcd7" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-2-JdbcTemplate/" data-id="cj17naz95001rw4lagb6iqt6g" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JdbcTemplate/">JdbcTemplate</a></li></ul>
@@ -683,7 +685,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-1-Jdbc/" data-id="cj0qhjg1j001v44la2l9qn7qu" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-1-Jdbc/" data-id="cj17naz9d001vw4lawtueyqrs" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jdbc/">Jdbc</a></li></ul>
@@ -760,7 +762,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-0-Intro/" data-id="cj0qhjfxg000044lapjaa6l3h" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-0-Intro/" data-id="cj17naz6f0000w4lae2yxvnk6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li></ul>
