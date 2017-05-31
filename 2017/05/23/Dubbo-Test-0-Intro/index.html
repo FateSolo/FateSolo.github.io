@@ -26,7 +26,7 @@ Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用�
 Dubbo是一个分布式服务框架，致力于提供高性能和透明化的RPC远程服务调用方案，是阿里巴巴SOA服务化治理方案的核心框架，但目前已经停止更新。
 Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用、基于Kryo和FS">
 <meta property="og:image" content="http://yoursite.com/images/dubbo-admin.png">
-<meta property="og:updated_time" content="2017-05-25T08:31:37.902Z">
+<meta property="og:updated_time" content="2017-05-31T06:16:32.369Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dubbo学习笔记 序">
 <meta name="twitter:description" content="项目地址：https://github.com/FateSolo/Dubbo-Test
@@ -126,7 +126,7 @@ Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用�
 <p>Provider: 暴露服务的服务提供方。<br>Consumer: 调用远程服务的服务消费方。<br>Registry: 服务注册与发现的注册中心。</p>
 <p>服务提供者将自己暴露的服务在注册中心注册，服务消费者在注册中心发现服务并调用，具体介绍参阅<a href="http://dubbo.io/User+Guide-zh.htm" target="_blank" rel="external">Dubbo用户指南</a>。</p>
 <h3 id="2-__u5B89_u88C5ZooKeeper_uFF1A"><a href="#2-__u5B89_u88C5ZooKeeper_uFF1A" class="headerlink" title="2. 安装ZooKeeper："></a>2. 安装ZooKeeper：</h3><p>ZooKeeper是一个分布式的，开放源码的分布式应用程序协调服务。它是Dubbo所推荐的注册中心，因此首先安装ZooKeeper。</p>
-<p>1) 在<a href="http://www.apache.org/dist/zookeeper/current/下载最新版本的ZooKeeper压缩包并解压。" target="_blank" rel="external">http://www.apache.org/dist/zookeeper/current/下载最新版本的ZooKeeper压缩包并解压。</a></p>
+<p>1) 在<a href="http://www.apache.org/dist/zookeeper/current/" target="_blank" rel="external">http://www.apache.org/dist/zookeeper/current/</a> 下载最新版本的ZooKeeper压缩包并解压。</p>
 <p>2) 解压后进入conf文件夹，复制zoo_sample.cfg，改名为zoo.cfg，ZooKeeper运行时默认加载此配置文件。</p>
 <p>3) 进入bin文件夹，键入如下命令启动ZooKeeper：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./zkServer.sh start</span><br></pre></td></tr></table></figure></p>
 <h3 id="3-__u90E8_u7F72dubbo-admin_uFF1A"><a href="#3-__u90E8_u7F72dubbo-admin_uFF1A" class="headerlink" title="3. 部署dubbo-admin："></a>3. 部署dubbo-admin：</h3><p>dubbo-admin是Dubbo官方提供的服务监控管理端，它是一个独立的运行于Tomcat等web容器的项目，不与服务提供者、服务消费者耦合，通过监控注册中心的方式实现了对服务的管理。</p>
@@ -136,14 +136,14 @@ Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用�
 <p>3) 退回到dubbox文件夹，键入命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn package -Dmaven.test.skip</span><br></pre></td></tr></table></figure></p>
 <p>请先确保安装好了Maven。</p>
 <p>4) 将dubbox/dubbo-admin/target下的war包拷贝至tomcat的webapps下，改名为dubbo-admin.war，启动tomcat即完成了部署。</p>
-<p>5) 访问<a href="http://localhost:8080/dubbo-admin，用户名与密码都键入root，便可进入该管理系统，如图：" target="_blank" rel="external">http://localhost:8080/dubbo-admin，用户名与密码都键入root，便可进入该管理系统，如图：</a><br><img src="/images/dubbo-admin.png" alt="dubbo-admin"></p>
+<p>5) 访问<a href="http://localhost:8080/dubbo-admin" target="_blank" rel="external">http://localhost:8080/dubbo-admin</a> ，用户名与密码都键入root，便可进入该管理系统，如图：<br><img src="/images/dubbo-admin.png" alt="dubbo-admin"></p>
 <hr>
 <p>作者 [@FateSolo]<br>2017 年 05月 23日</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/23/Dubbo-Test-0-Intro/" data-id="cj3clbeom001mpnlax2eyz7kt" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/23/Dubbo-Test-0-Intro/" data-id="cj3cls7e5001m1ela4jk8pb8b" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li></ul>
