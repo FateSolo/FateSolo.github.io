@@ -66,6 +66,73 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-DAO-Test-3-Mybatis" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/03/12/DAO-Test-3-Mybatis/" class="article-date">
+  <time datetime="2017-03-12T13:23:10.000Z" itemprop="datePublished">2017-03-12</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/DAO系列/">DAO系列</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/03/12/DAO-Test-3-Mybatis/">DAO层实现示例 三：Mybatis框架</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<p>项目地址：<br><a href="https://github.com/FateSolo/DAO-Test" target="_blank" rel="external">https://github.com/FateSolo/DAO-Test</a></p>
+<h3 id="u76EE_u5F55_uFF1A"><a href="#u76EE_u5F55_uFF1A" class="headerlink" title="目录："></a>目录：</h3><ul>
+<li><a href="/2017/03/12/DAO-Test-0-Intro/">0. 项目搭建</a></li>
+<li><a href="/2017/03/12/DAO-Test-1-Jdbc/">1. 原生Jdbc</a></li>
+<li><a href="/2017/03/12/DAO-Test-2-JdbcTemplate/">2. JdbcTemplate</a></li>
+<li><a href="/2017/03/12/DAO-Test-3-Mybatis/">3. Mybatis</a></li>
+<li><a href="/2017/03/12/DAO-Test-4-Hibernate/">4. Hibernate</a></li>
+<li><a href="/2017/03/12/DAO-Test-5-JPA/">5. JPA</a></li>
+<li><a href="/2017/03/12/DAO-Test-6-SpringDataJPA/">6. Spring-Data-JPA</a></li>
+</ul>
+<p>该系列文章将展示六种不同的DAO层实现方法并总结其不同，本章使用Mybatis框架完成DAO操作。</p>
+<h3 id="1-__u793A_u4F8B_u4EE3_u7801_uFF1A"><a href="#1-__u793A_u4F8B_u4EE3_u7801_uFF1A" class="headerlink" title="1. 示例代码："></a>1. 示例代码：</h3><p>1) 在spring-common.xml中，配置Mybatis：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- Mybatis --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"sqlSessionFactory"</span> <span class="attribute">class</span>=<span class="value">"org.mybatis.spring.SqlSessionFactoryBean"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"dataSource"</span> <span class="attribute">ref</span>=<span class="value">"dataSource"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"typeAliasesPackage"</span> <span class="attribute">value</span>=<span class="value">"com.fatesolo.entity"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"mapperLocations"</span> <span class="attribute">value</span>=<span class="value">"classpath:mapper/*Impl.xml"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">class</span>=<span class="value">"org.mybatis.spring.mapper.MapperScannerConfigurer"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"basePackage"</span> <span class="attribute">value</span>=<span class="value">"com.fatesolo.dao.impl"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"sqlSessionFactoryBeanName"</span> <span class="attribute">value</span>=<span class="value">"sqlSessionFactory"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>2) 在build.gradle中，添加Mybatis依赖：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">compile &#39;org.mybatis:mybatis:3.4.2&#39;&#10;compile &#39;org.mybatis:mybatis-spring:1.3.1&#39;</span><br></pre></td></tr></table></figure></p>
+<p>3) 在dao.impl包中创建BookDaoMybatisImpl.java，编写如下代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.dao.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.fatesolo.dao.BookDao;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Repository;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@Repository</span>(<span class="string">"bookDaoMybatisImpl"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BookDaoMybatisImpl</span> <span class="keyword">extends</span> <span class="title">BookDao</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4) 在Resource文件夹下添加子目录mapper，创建并编写BookDaoMybatisImpl.xml：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="pi">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="doctype">&lt;!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">mapper</span> <span class="attribute">namespace</span>=<span class="value">"com.fatesolo.dao.impl.BookDaoMybatisImpl"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">select</span> <span class="attribute">id</span>=<span class="value">"findById"</span> <span class="attribute">parameterType</span>=<span class="value">"int"</span> <span class="attribute">resultType</span>=<span class="value">"Book"</span>&gt;</span></span><br><span class="line">        select id, name, author from book where id = #&#123;id&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="title">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">select</span> <span class="attribute">id</span>=<span class="value">"findByNameContaining"</span> <span class="attribute">parameterType</span>=<span class="value">"java.lang.String"</span> <span class="attribute">resultType</span>=<span class="value">"Book"</span>&gt;</span></span><br><span class="line">        select id, name, author from book where name like concat('%', #&#123;name&#125;, '%')</span><br><span class="line">    <span class="tag">&lt;/<span class="title">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">insert</span> <span class="attribute">id</span>=<span class="value">"save"</span> <span class="attribute">parameterType</span>=<span class="value">"Book"</span> <span class="attribute">useGeneratedKeys</span>=<span class="value">"true"</span> <span class="attribute">keyProperty</span>=<span class="value">"id"</span>&gt;</span></span><br><span class="line">        insert into book(name, author) values(#&#123;name&#125;, #&#123;author&#125;)</span><br><span class="line">    <span class="tag">&lt;/<span class="title">insert</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="title">mapper</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>5) 打开BookService.java，修改成员变量bookDao的注解：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@Resource</span>(name = <span class="string">"bookDaoMybatisImpl"</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-__u9879_u76EE_u8FD0_u884C_uFF1A"><a href="#2-__u9879_u76EE_u8FD0_u884C_uFF1A" class="headerlink" title="2. 项目运行："></a>2. 项目运行：</h3><p>1) 使用Tomcat 8运行项目，使用curl工具添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -d &#34;name=Test3&#38;author=Fate&#34; http://localhost:8080/book</span><br></pre></td></tr></table></figure></p>
+<p>得到如下返回：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book&#123;id=3, name=&#39;Test3&#39;, author=&#39;Fate&#39;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2) 访问<a href="http://localhost:8080/book/3" target="_blank" rel="external">http://localhost:8080/book/3</a> ，得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book&#123;id=3, name=&#39;Test3&#39;, author=&#39;Fate&#39;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3) 访问<a href="http://localhost:8080/book/name/Test" target="_blank" rel="external">http://localhost:8080/book/name/Test</a> ，得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Book&#123;id=1, name=&#39;Test1&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=2, name=&#39;Test2&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=3, name=&#39;Test3&#39;, author=&#39;Fate&#39;&#125;]</span><br></pre></td></tr></table></figure></p>
+<h3 id="3-__u603B_u7ED3"><a href="#3-__u603B_u7ED3" class="headerlink" title="3. 总结"></a>3. 总结</h3><p>Mybatis是轻量级的持久层框架，通过在xml文件中编写sql并与Mapper接口映射，完成DAO层操作。</p>
+<p>可以看到使用Mybatis，开发者无需再手动建立实体与表的关系，Mybatis会自动完成实体成员变量与表字段的映射，具备了ORM特性，但仍需要手动编写sql。</p>
+<hr>
+<p>作者 [@FateSolo]<br>2017 年 03月 12日</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-3-Mybatis/" data-id="cj3sx4y9s0025umladjxn5jlc" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Mybatis/">Mybatis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-DAO-Test-2-JdbcTemplate" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/03/12/DAO-Test-2-JdbcTemplate/" class="article-date">
@@ -119,7 +186,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-2-JdbcTemplate/" data-id="cj3cls7f000241ela44unvzsc" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-2-JdbcTemplate/" data-id="cj3sx4y9v0028umlawmfhpkcn" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JdbcTemplate/">JdbcTemplate</a></li></ul>
@@ -184,7 +251,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-1-Jdbc/" data-id="cj3cls7f500281elaabb4qxet" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-1-Jdbc/" data-id="cj3sx4y9z002cumlaffkn7axt" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jdbc/">Jdbc</a></li></ul>
@@ -261,7 +328,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-0-Intro/" data-id="cj3cls79v00001elauldtgrgr" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-0-Intro/" data-id="cj3sx4y6q0000umlagfp1np7d" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li></ul>
@@ -384,7 +451,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/02/18/SSM-Test/" data-id="cj3cls7bn00081elaam2bfgag" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/02/18/SSM-Test/" data-id="cj3sx4y7q0008umlagimxnfjb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li></ul>
@@ -459,7 +526,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/02/06/Five-Chess-Client/" data-id="cj3cls7dj001a1elayydwhth9" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/02/06/Five-Chess-Client/" data-id="cj3sx4y8p001aumlawl8t9ce6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
@@ -578,7 +645,7 @@ $ sudo twistd -y FiveChessServer.py
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/02/06/Five-Chess-Server/" data-id="cj3cls7dc00151elazp4af8sb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/02/06/Five-Chess-Server/" data-id="cj3sx4y8j0015umlay4k3ps7o" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
@@ -660,7 +727,7 @@ $ sudo twistd -y FiveChessServer.py
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/12/28/My-Gradle-Test/" data-id="cj3cls7bs000f1ela19yte2vo" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2015/12/28/My-Gradle-Test/" data-id="cj3sx4y7w000fumla3ipkwhl5" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li></ul>
@@ -707,7 +774,7 @@ $ sudo twistd -y FiveChessServer.py
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/12/28/hello-world/" data-id="cj3cls7be00071elaxg1dop68" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2015/12/28/hello-world/" data-id="cj3sx4y7l0007umlayvuzopod" class="article-share-link">Share</a>
       
       
     </footer>
@@ -750,7 +817,7 @@ $ sudo twistd -y FiveChessServer.py
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Dubbo/" style="font-size: 10px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 16.67px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 16.67px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 16.67px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 13.33px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 20px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 13.33px;">五子棋</a>
+      <a href="/tags/Dubbo/" style="font-size: 12.5px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 15px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 15px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 15px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12.5px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 17.5px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 12.5px;">五子棋</a>
     </div>
   </div>
 
@@ -772,6 +839,10 @@ $ sudo twistd -y FiveChessServer.py
       <ul>
         
           <li>
+            <a href="/2017/05/31/Dubbo-Test-3-Spring/">Dubbo学习笔记 三：搭建Spring + Dubbo框架</a>
+          </li>
+        
+          <li>
             <a href="/2017/05/25/Dubbo-Test-2-Gradle/">Dubbo学习笔记 二：使用Gradle构建多module项目</a>
           </li>
         
@@ -785,10 +856,6 @@ $ sudo twistd -y FiveChessServer.py
         
           <li>
             <a href="/2017/03/22/JSH-Test-3-Other/">JAX-RS初探 三：其他</a>
-          </li>
-        
-          <li>
-            <a href="/2017/03/22/JSH-Test-2-Spring/">JAX-RS初探 二：整合Spring + Spring-Data-JPA</a>
           </li>
         
       </ul>

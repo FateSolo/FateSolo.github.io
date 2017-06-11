@@ -10,9 +10,10 @@
 0. 序
 1. Maven构建项目
 2. Gradle构建项目
+3. 搭建Spring + Dubbo框架
 
-在本章将用Gradle重新构建多module项目Dubbo-Test，以比较和Maven的区别。
-1. 项目创建：1) 创建名为Dubbo-Test的文件夹并进入：1mkdir Dubbo-Test &amp;#38;&amp;#38; cd Dubbo">
+在本章将用Gradle重新构建多module项目Dubbo-Test，以展示和Maven的区别。
+1. 项目创建：1) 创建名为Dubbo-Test的文件夹并进入：1mkdir Dubbo-Te">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Dubbo学习笔记 二：使用Gradle构建多module项目">
 <meta property="og:url" content="http://yoursite.com/2017/05/25/Dubbo-Test-2-Gradle/index.html">
@@ -22,10 +23,11 @@
 0. 序
 1. Maven构建项目
 2. Gradle构建项目
+3. 搭建Spring + Dubbo框架
 
-在本章将用Gradle重新构建多module项目Dubbo-Test，以比较和Maven的区别。
-1. 项目创建：1) 创建名为Dubbo-Test的文件夹并进入：1mkdir Dubbo-Test &amp;#38;&amp;#38; cd Dubbo">
-<meta property="og:updated_time" content="2017-05-31T06:20:26.477Z">
+在本章将用Gradle重新构建多module项目Dubbo-Test，以展示和Maven的区别。
+1. 项目创建：1) 创建名为Dubbo-Test的文件夹并进入：1mkdir Dubbo-Te">
+<meta property="og:updated_time" content="2017-06-11T13:13:45.738Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dubbo学习笔记 二：使用Gradle构建多module项目">
 <meta name="twitter:description" content="项目地址：https://github.com/FateSolo/Dubbo-Test
@@ -33,9 +35,10 @@
 0. 序
 1. Maven构建项目
 2. Gradle构建项目
+3. 搭建Spring + Dubbo框架
 
-在本章将用Gradle重新构建多module项目Dubbo-Test，以比较和Maven的区别。
-1. 项目创建：1) 创建名为Dubbo-Test的文件夹并进入：1mkdir Dubbo-Test &amp;#38;&amp;#38; cd Dubbo">
+在本章将用Gradle重新构建多module项目Dubbo-Test，以展示和Maven的区别。
+1. 项目创建：1) 创建名为Dubbo-Test的文件夹并进入：1mkdir Dubbo-Te">
   
     <link rel="alternate" href="/atom.xml" title="Fate Solo" type="application/atom+xml">
   
@@ -118,8 +121,9 @@
 <li><a href="/2017/05/23/Dubbo-Test-0-Intro/">0. 序</a></li>
 <li><a href="/2017/05/24/Dubbo-Test-1-Maven/">1. Maven构建项目</a></li>
 <li><a href="/2017/05/25/Dubbo-Test-2-Gradle/">2. Gradle构建项目</a></li>
+<li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
 </ul>
-<p>在本章将用Gradle重新构建多module项目Dubbo-Test，以比较和Maven的区别。</p>
+<p>在本章将用Gradle重新构建多module项目Dubbo-Test，以展示和Maven的区别。</p>
 <h3 id="1-__u9879_u76EE_u521B_u5EFA_uFF1A"><a href="#1-__u9879_u76EE_u521B_u5EFA_uFF1A" class="headerlink" title="1. 项目创建："></a>1. 项目创建：</h3><p>1) 创建名为Dubbo-Test的文件夹并进入：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir Dubbo-Test &#38;&#38; cd Dubbo-Test</span><br></pre></td></tr></table></figure></p>
 <p>2) 创建Gradle Wrapper，但不是必需的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gradle wrapper</span><br></pre></td></tr></table></figure></p>
 <h3 id="2-__u521B_u5EFAparent_module_uFF1A"><a href="#2-__u521B_u5EFAparent_module_uFF1A" class="headerlink" title="2. 创建parent module："></a>2. 创建parent module：</h3><p>1) 创建build.gradle：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">subprojects &#123;</span><br><span class="line"></span><br><span class="line">    group <span class="string">'com.fatesolo'</span></span><br><span class="line">    version <span class="string">'1.0-SNAPSHOT'</span></span><br><span class="line"></span><br><span class="line">    apply <span class="string">plugin:</span> <span class="string">'java'</span></span><br><span class="line"></span><br><span class="line">    repositories &#123;</span><br><span class="line">        mavenCentral()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    dependencies &#123;</span><br><span class="line">        testCompile <span class="string">group:</span> <span class="string">'junit'</span>, <span class="string">name:</span> <span class="string">'junit'</span>, <span class="string">version:</span> <span class="string">'4.11'</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
@@ -142,7 +146,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/25/Dubbo-Test-2-Gradle/" data-id="cj3cls7dp001d1elaqkk4szi6" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/25/Dubbo-Test-2-Gradle/" data-id="cj3sx4y90001jumla1ln1vzv7" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gradle/">Gradle</a></li></ul>
@@ -152,6 +156,15 @@
   
     
 <nav id="article-nav">
+  
+    <a href="/2017/05/31/Dubbo-Test-3-Spring/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Dubbo学习笔记 三：搭建Spring + Dubbo框架
+        
+      </div>
+    </a>
   
   
     <a href="/2017/05/24/Dubbo-Test-1-Maven/" id="article-nav-older" class="article-nav-link-wrap">
@@ -192,7 +205,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Dubbo/" style="font-size: 10px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 16.67px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 16.67px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 16.67px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 13.33px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 20px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 13.33px;">五子棋</a>
+      <a href="/tags/Dubbo/" style="font-size: 12.5px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 15px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 15px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 15px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12.5px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 17.5px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 12.5px;">五子棋</a>
     </div>
   </div>
 
@@ -214,6 +227,10 @@
       <ul>
         
           <li>
+            <a href="/2017/05/31/Dubbo-Test-3-Spring/">Dubbo学习笔记 三：搭建Spring + Dubbo框架</a>
+          </li>
+        
+          <li>
             <a href="/2017/05/25/Dubbo-Test-2-Gradle/">Dubbo学习笔记 二：使用Gradle构建多module项目</a>
           </li>
         
@@ -227,10 +244,6 @@
         
           <li>
             <a href="/2017/03/22/JSH-Test-3-Other/">JAX-RS初探 三：其他</a>
-          </li>
-        
-          <li>
-            <a href="/2017/03/22/JSH-Test-2-Spring/">JAX-RS初探 二：整合Spring + Spring-Data-JPA</a>
           </li>
         
       </ul>

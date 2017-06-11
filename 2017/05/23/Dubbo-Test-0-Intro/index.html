@@ -10,9 +10,10 @@
 0. 序
 1. Maven构建项目
 2. Gradle构建项目
+3. 搭建Spring + Dubbo框架
 
 Dubbo是一个分布式服务框架，致力于提供高性能和透明化的RPC远程服务调用方案，是阿里巴巴SOA服务化治理方案的核心框架，但目前已经停止更新。
-Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用、基于Kryo和FS">
+Dubbox，是当当网基于Dubbo开发的框架，">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Dubbo学习笔记 序">
 <meta property="og:url" content="http://yoursite.com/2017/05/23/Dubbo-Test-0-Intro/index.html">
@@ -22,11 +23,12 @@ Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用�
 0. 序
 1. Maven构建项目
 2. Gradle构建项目
+3. 搭建Spring + Dubbo框架
 
 Dubbo是一个分布式服务框架，致力于提供高性能和透明化的RPC远程服务调用方案，是阿里巴巴SOA服务化治理方案的核心框架，但目前已经停止更新。
-Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用、基于Kryo和FS">
+Dubbox，是当当网基于Dubbo开发的框架，">
 <meta property="og:image" content="http://yoursite.com/images/dubbo-admin.png">
-<meta property="og:updated_time" content="2017-05-31T06:16:32.369Z">
+<meta property="og:updated_time" content="2017-06-11T13:13:37.906Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dubbo学习笔记 序">
 <meta name="twitter:description" content="项目地址：https://github.com/FateSolo/Dubbo-Test
@@ -34,9 +36,10 @@ Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用�
 0. 序
 1. Maven构建项目
 2. Gradle构建项目
+3. 搭建Spring + Dubbo框架
 
 Dubbo是一个分布式服务框架，致力于提供高性能和透明化的RPC远程服务调用方案，是阿里巴巴SOA服务化治理方案的核心框架，但目前已经停止更新。
-Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用、基于Kryo和FS">
+Dubbox，是当当网基于Dubbo开发的框架，">
   
     <link rel="alternate" href="/atom.xml" title="Fate Solo" type="application/atom+xml">
   
@@ -119,6 +122,7 @@ Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用�
 <li><a href="/2017/05/23/Dubbo-Test-0-Intro/">0. 序</a></li>
 <li><a href="/2017/05/24/Dubbo-Test-1-Maven/">1. Maven构建项目</a></li>
 <li><a href="/2017/05/25/Dubbo-Test-2-Gradle/">2. Gradle构建项目</a></li>
+<li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
 </ul>
 <p>Dubbo是一个分布式服务框架，致力于提供高性能和透明化的RPC远程服务调用方案，是阿里巴巴SOA服务化治理方案的核心框架，但目前已经停止更新。</p>
 <p>Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用、基于Kryo和FST的Java高效序列化实现等功能。</p>
@@ -133,7 +137,7 @@ Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用�
 <p>1) 下载源码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone git@github.com:dangdangdotcom/dubbox.git</span><br></pre></td></tr></table></figure></p>
 <p>也可以采用别的方式下载源码，甚至可以直接下载网络上已经打成war包的项目，但建议下载最新源码并手动打成war包。</p>
 <p>2) 进入dubbox/dubbo-admin/src/main/webapp/WEB-INF文件夹，打开dubbo.properties配置文件，确保注册中心地址指向你的ZooKeeper，例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dubbo.registry.address=zookeeper://127.0.0.1:2181</span><br></pre></td></tr></table></figure></p>
-<p>3) 退回到dubbox文件夹，键入命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn package -Dmaven.test.skip</span><br></pre></td></tr></table></figure></p>
+<p>3) 退回到dubbox文件夹，键入命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn install -Dmaven.test.skip</span><br></pre></td></tr></table></figure></p>
 <p>请先确保安装好了Maven。</p>
 <p>4) 将dubbox/dubbo-admin/target下的war包拷贝至tomcat的webapps下，改名为dubbo-admin.war，启动tomcat即完成了部署。</p>
 <p>5) 访问<a href="http://localhost:8080/dubbo-admin" target="_blank" rel="external">http://localhost:8080/dubbo-admin</a> ，用户名与密码都键入root，便可进入该管理系统，如图：<br><img src="/images/dubbo-admin.png" alt="dubbo-admin"></p>
@@ -143,7 +147,7 @@ Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用�
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/23/Dubbo-Test-0-Intro/" data-id="cj3cls7e5001m1ela4jk8pb8b" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/23/Dubbo-Test-0-Intro/" data-id="cj3sx4y9a001rumlai9atjftt" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li></ul>
@@ -202,7 +206,7 @@ Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用�
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Dubbo/" style="font-size: 10px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 16.67px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 16.67px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 16.67px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 13.33px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 20px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 13.33px;">五子棋</a>
+      <a href="/tags/Dubbo/" style="font-size: 12.5px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 15px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 15px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 15px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12.5px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 17.5px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 12.5px;">五子棋</a>
     </div>
   </div>
 
@@ -224,6 +228,10 @@ Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用�
       <ul>
         
           <li>
+            <a href="/2017/05/31/Dubbo-Test-3-Spring/">Dubbo学习笔记 三：搭建Spring + Dubbo框架</a>
+          </li>
+        
+          <li>
             <a href="/2017/05/25/Dubbo-Test-2-Gradle/">Dubbo学习笔记 二：使用Gradle构建多module项目</a>
           </li>
         
@@ -237,10 +245,6 @@ Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用�
         
           <li>
             <a href="/2017/03/22/JSH-Test-3-Other/">JAX-RS初探 三：其他</a>
-          </li>
-        
-          <li>
-            <a href="/2017/03/22/JSH-Test-2-Spring/">JAX-RS初探 二：整合Spring + Spring-Data-JPA</a>
           </li>
         
       </ul>
