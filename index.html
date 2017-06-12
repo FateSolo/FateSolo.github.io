@@ -66,6 +66,80 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Dubbo-Test-5-Cluster" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/03/Dubbo-Test-5-Cluster/" class="article-date">
+  <time datetime="2017-06-03T14:30:37.000Z" itemprop="datePublished">2017-06-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Dubbo系列/">Dubbo系列</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/06/03/Dubbo-Test-5-Cluster/">Dubbo学习笔记 五：Dubbo服务集群</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<p>项目地址：<br><a href="https://github.com/FateSolo/Dubbo-Test" target="_blank" rel="external">https://github.com/FateSolo/Dubbo-Test</a></p>
+<h3 id="u76EE_u5F55_uFF1A"><a href="#u76EE_u5F55_uFF1A" class="headerlink" title="目录："></a>目录：</h3><ul>
+<li><a href="/2017/05/23/Dubbo-Test-0-Intro/">0. 序</a></li>
+<li><a href="/2017/05/24/Dubbo-Test-1-Maven/">1. Maven构建项目</a></li>
+<li><a href="/2017/05/25/Dubbo-Test-2-Gradle/">2. Gradle构建项目</a></li>
+<li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
+<li><a href="/2017/06/02/Dubbo-Test-4-RESTful/">4. 支持RESTful Remoting</a></li>
+<li><a href="/2017/06/03/Dubbo-Test-5-Cluster/">5. Dubbo服务集群</a></li>
+</ul>
+<p>在本章将测试Dubbo的服务集群功能。</p>
+<h3 id="1-__u670D_u52A1_u6253_u5305"><a href="#1-__u670D_u52A1_u6253_u5305" class="headerlink" title="1. 服务打包"></a>1. 服务打包</h3><p>将dubbo-server打成jar包，然后用java -jar命令运行。</p>
+<p>1) 打开dubbo-server下的build.gradle，增加如下代码：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">task copyLib(<span class="string">type :</span> Copy) &#123;</span><br><span class="line">    from &#123; configurations.compile &#125;</span><br><span class="line">    into(<span class="string">'lib'</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">jar &#123;</span><br><span class="line">    manifest &#123;</span><br><span class="line">        attributes <span class="string">'Main-Class'</span>: <span class="string">'com.fatesolo.dubbo.server.service.impl.BookServiceImpl'</span></span><br><span class="line">        attributes <span class="string">'Class-Path'</span>: <span class="keyword">new</span> File(<span class="string">'lib'</span>).list().findAll &#123;</span><br><span class="line">            it.endsWith(<span class="string">'.jar'</span>)</span><br><span class="line">        &#125;.collect &#123; <span class="string">"lib/$it"</span> &#125;.join(<span class="string">' '</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>copyLib负责将dubbo-server的所有依赖拷贝至lib文件夹下，attributes ‘Main-Class’指定jar包运行入口，attributes ‘Class-Path’指定jar包的所有依赖，即lib文件夹下的所有jar包。</p>
+<p>2) 打开dubbo-server.xml，注释掉dubbo协议（此时服务使用的是rest协议）。</p>
+<p>3) 进入到dubbo-server目录下，键入如下命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gradle copyLib</span><br></pre></td></tr></table></figure></p>
+<p>在dubbo-server文件夹下已经生成了lib文件夹。</p>
+<p>4) 继续键入如下命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gradle build</span><br></pre></td></tr></table></figure></p>
+<p>在dubbo-server/build/libs文件夹下已经生成了dubbo-server-1.0-SNAPSHOT.jar。</p>
+<h3 id="2-__u670D_u52A1_u90E8_u7F72"><a href="#2-__u670D_u52A1_u90E8_u7F72" class="headerlink" title="2. 服务部署"></a>2. 服务部署</h3><p>因为资源有限，这里只在一台机器内同时运行两个服务。</p>
+<p>1) 将lib文件夹和jar包放至同一个目录，键入如下命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar dubbo-server-<span class="number">1.0</span>-SNAPSHOT.jar</span><br></pre></td></tr></table></figure></p>
+<p>即可运行第一个服务。</p>
+<p>2) 此时服务端口已被占用，修改jar包内的dubbo-server.xml，更改协议端口：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">dubbo:protocol</span> <span class="attribute">name</span>=<span class="value">"dubbo"</span> <span class="attribute">port</span>=<span class="value">"20880"</span> <span class="attribute">serialization</span>=<span class="value">"kryo"</span></span><br><span class="line">                <span class="attribute">optimizer</span>=<span class="value">"com.fatesolo.dubbo.api.serialization.SerializationOptimizerImpl"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--&lt;dubbo:protocol name="rest" port="7110" server="tomcat" contextpath="dubbo-server"/&gt;--&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">dubbo:service</span> <span class="attribute">interface</span>=<span class="value">"com.fatesolo.dubbo.api.service.BookService"</span></span><br><span class="line">               <span class="attribute">ref</span>=<span class="value">"bookServiceImpl"</span> <span class="attribute">protocol</span>=<span class="value">"dubbo"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>即使用dubbo协议，注释掉rest协议，然后便可以运行第二个服务。</p>
+<h3 id="3-__u96C6_u7FA4_u6D4B_u8BD5"><a href="#3-__u96C6_u7FA4_u6D4B_u8BD5" class="headerlink" title="3. 集群测试"></a>3. 集群测试</h3><p>在dubbo-admin中，可以看到20880端口和7110端口同时提供了com.fatesolo.dubbo.api.service.BookService服务。</p>
+<p>1) 运行dubbo-client。</p>
+<p>2) 使用dubbo-client添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -d &#34;name=Book1&#38;author=Fate&#34; http://localhost:8080/dubbo-client/book</span><br></pre></td></tr></table></figure></p>
+<p>3) 连续访问<a href="http://localhost:8080/dubbo-client/book" target="_blank" rel="external">http://localhost:8080/dubbo-client/book</a> ，将随机得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[&#123;&#34;id&#34;:1,&#34;name&#34;:&#34;Book1&#34;,&#34;author&#34;:&#34;Fate&#34;&#125;]</span><br></pre></td></tr></table></figure></p>
+<p>或者<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[]</span><br></pre></td></tr></table></figure></p>
+<p>会出现这种情况，是因为Dubbo的负载均衡策略缺省为random随机调用。因此添加数据被随机添加到了其中一个服务中，访问同样是随机访问其中一个服务。</p>
+<hr>
+<p>作者 [@FateSolo]<br>2017 年 06月 03日</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/06/03/Dubbo-Test-5-Cluster/" data-id="cj3ualfo2001dgtlais4pha5d" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Dubbo-Test-4-RESTful" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/06/02/Dubbo-Test-4-RESTful/" class="article-date">
@@ -131,7 +205,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/06/02/Dubbo-Test-4-RESTful/" data-id="cj3u4c5gr001dz0la8mfbo96r" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/06/02/Dubbo-Test-4-RESTful/" data-id="cj3ualfo6001igtlagtmvona1" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li></ul>
@@ -220,7 +294,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/31/Dubbo-Test-3-Spring/" data-id="cj3u4c5gz001jz0lai7o7mca9" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/31/Dubbo-Test-3-Spring/" data-id="cj3ualfob001mgtlajpgfvhle" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
@@ -290,7 +364,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/25/Dubbo-Test-2-Gradle/" data-id="cj3u4c5h6001nz0la2jl59kr4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/25/Dubbo-Test-2-Gradle/" data-id="cj3ualfoh001qgtlazqx9szhc" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gradle/">Gradle</a></li></ul>
@@ -364,7 +438,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/24/Dubbo-Test-1-Maven/" data-id="cj3u4c5hd001sz0lacx42jhdz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/24/Dubbo-Test-1-Maven/" data-id="cj3ualfoo001vgtlactzp72n2" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven/">Maven</a></li></ul>
@@ -434,7 +508,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/23/Dubbo-Test-0-Intro/" data-id="cj3u4c5hm001xz0laz1buohn1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/23/Dubbo-Test-0-Intro/" data-id="cj3ualfou0020gtlayn1ezmob" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li></ul>
@@ -519,7 +593,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-3-Other/" data-id="cj3u4c5fp000kz0lao8fxg09p" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-3-Other/" data-id="cj3ualfn6000kgtla243cknoh" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Logback/">Logback</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li></ul>
@@ -590,7 +664,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-2-Spring/" data-id="cj3u4c5g2000uz0layec0pn4m" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-2-Spring/" data-id="cj3ualfnh000ugtlavpw3amjl" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li></ul>
@@ -666,7 +740,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-1-Jersey/" data-id="cj3u4c5g80011z0lapdvnskix" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-1-Jersey/" data-id="cj3ualfnn0011gtlagsehm9gn" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jersey/">Jersey</a></li></ul>
@@ -735,7 +809,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-6-SpringDataJPA/" data-id="cj3u4c5hr0020z0la8f50hkix" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-6-SpringDataJPA/" data-id="cj3ualfox0023gtla0zu5pxrl" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li></ul>
@@ -747,76 +821,10 @@
 
 
   
-    <article id="post-DAO-Test-5-JPA" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/03/12/DAO-Test-5-JPA/" class="article-date">
-  <time datetime="2017-03-12T14:34:28.000Z" itemprop="datePublished">2017-03-12</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/DAO系列/">DAO系列</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/12/DAO-Test-5-JPA/">DAO层实现示例 五：JPA</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <hr>
-<p>项目地址：<br><a href="https://github.com/FateSolo/DAO-Test" target="_blank" rel="external">https://github.com/FateSolo/DAO-Test</a></p>
-<h3 id="u76EE_u5F55_uFF1A"><a href="#u76EE_u5F55_uFF1A" class="headerlink" title="目录："></a>目录：</h3><ul>
-<li><a href="/2017/03/12/DAO-Test-0-Intro/">0. 项目搭建</a></li>
-<li><a href="/2017/03/12/DAO-Test-1-Jdbc/">1. 原生Jdbc</a></li>
-<li><a href="/2017/03/12/DAO-Test-2-JdbcTemplate/">2. JdbcTemplate</a></li>
-<li><a href="/2017/03/12/DAO-Test-3-Mybatis/">3. Mybatis</a></li>
-<li><a href="/2017/03/12/DAO-Test-4-Hibernate/">4. Hibernate</a></li>
-<li><a href="/2017/03/12/DAO-Test-5-JPA/">5. JPA</a></li>
-<li><a href="/2017/03/12/DAO-Test-6-SpringDataJPA/">6. Spring-Data-JPA</a></li>
-</ul>
-<p>该系列文章将展示六种不同的DAO层实现方法并总结其不同，本章使用JPA (Hibernate实现) 完成DAO操作。</p>
-<h3 id="1-__u793A_u4F8B_u4EE3_u7801_uFF1A"><a href="#1-__u793A_u4F8B_u4EE3_u7801_uFF1A" class="headerlink" title="1. 示例代码："></a>1. 示例代码：</h3><p>1) 在spring-common.xml中，配置JPA的EntityManagerFactory：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- JPA --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"entityManagerFactory"</span> <span class="attribute">class</span>=<span class="value">"org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"dataSource"</span> <span class="attribute">ref</span>=<span class="value">"dataSource"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"packagesToScan"</span> <span class="attribute">value</span>=<span class="value">"com.fatesolo.entity"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"jpaVendorAdapter"</span> <span class="attribute">ref</span>=<span class="value">"jpaVendorAdapter"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"jpaProperties"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">props</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">prop</span> <span class="attribute">key</span>=<span class="value">"hibernate.dialect"</span>&gt;</span>org.hibernate.dialect.MySQL5Dialect<span class="tag">&lt;/<span class="title">prop</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">prop</span> <span class="attribute">key</span>=<span class="value">"hibernate.show_sql"</span>&gt;</span>true<span class="tag">&lt;/<span class="title">prop</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">prop</span> <span class="attribute">key</span>=<span class="value">"hibernate.format_sql"</span>&gt;</span>true<span class="tag">&lt;/<span class="title">prop</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">prop</span> <span class="attribute">key</span>=<span class="value">"hibernate.hbm2ddl.auto"</span>&gt;</span>update<span class="tag">&lt;/<span class="title">prop</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="title">props</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"jpaVendorAdapter"</span> <span class="attribute">class</span>=<span class="value">"org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"generateDdl"</span> <span class="attribute">value</span>=<span class="value">"false"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"database"</span> <span class="attribute">value</span>=<span class="value">"MYSQL"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"databasePlatform"</span> <span class="attribute">value</span>=<span class="value">"org.hibernate.dialect.MySQL5InnoDBDialect"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>注释掉Hibernate的事务管理器，并配置JPA的事务管理器<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 配置 JPA 事务 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"transactionManager"</span> <span class="attribute">class</span>=<span class="value">"org.springframework.orm.jpa.JpaTransactionManager"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"entityManagerFactory"</span> <span class="attribute">ref</span>=<span class="value">"entityManagerFactory"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">tx:annotation-driven</span> <span class="attribute">transaction-manager</span>=<span class="value">"transactionManager"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>2) 在dao.impl包中创建BookDaoJpaImpl.java，编写如下代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.dao.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.fatesolo.dao.BookDao;</span><br><span class="line"><span class="keyword">import</span> com.fatesolo.entity.Book;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Repository;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.persistence.EntityManager;</span><br><span class="line"><span class="keyword">import</span> javax.persistence.PersistenceContext;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@Repository</span>(<span class="string">"bookDaoJpaImpl"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BookDaoJpaImpl</span> <span class="keyword">implements</span> <span class="title">BookDao</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@PersistenceContext</span>(unitName = <span class="string">"entityManagerFactory"</span>)</span><br><span class="line">    <span class="keyword">private</span> EntityManager entityManager;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Book <span class="title">findById</span><span class="params">(<span class="keyword">int</span> id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> entityManager.find(Book.class, id);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Book&gt; <span class="title">findByNameContaining</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> entityManager.createQuery(<span class="string">"select b from Book b where b.name like ?"</span>, Book.class)</span><br><span class="line">                .setParameter(<span class="number">0</span>, <span class="string">"%"</span> + name + <span class="string">"%"</span>)</span><br><span class="line">                .getResultList();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">save</span><span class="params">(Book book)</span> </span>&#123;</span><br><span class="line">        entityManager.persist(book);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>3) 打开BookService.java，修改成员变量bookDao的注解：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@Resource</span>(name = <span class="string">"bookDaoJpaImpl"</span>)</span><br></pre></td></tr></table></figure></p>
-<h3 id="2-__u9879_u76EE_u8FD0_u884C_uFF1A"><a href="#2-__u9879_u76EE_u8FD0_u884C_uFF1A" class="headerlink" title="2. 项目运行："></a>2. 项目运行：</h3><p>1) 使用Tomcat 8运行项目，使用curl工具添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -d &#34;name=Test5&#38;author=Fate&#34; http://localhost:8080/book</span><br></pre></td></tr></table></figure></p>
-<p>得到如下返回：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book&#123;id=5, name=&#39;Test5&#39;, author=&#39;Fate&#39;&#125;</span><br></pre></td></tr></table></figure></p>
-<p>2) 访问<a href="http://localhost:8080/book/5" target="_blank" rel="external">http://localhost:8080/book/5</a> ，得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book&#123;id=5, name=&#39;Test5&#39;, author=&#39;Fate&#39;&#125;</span><br></pre></td></tr></table></figure></p>
-<p>3) 访问<a href="http://localhost:8080/book/name/Test" target="_blank" rel="external">http://localhost:8080/book/name/Test</a> ，得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Book&#123;id=1, name=&#39;Test1&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=2, name=&#39;Test2&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=3, name=&#39;Test3&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=4, name=&#39;Test4&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=5, name=&#39;Test5&#39;, author=&#39;Fate&#39;&#125;]</span><br></pre></td></tr></table></figure></p>
-<h3 id="3-__u603B_u7ED3"><a href="#3-__u603B_u7ED3" class="headerlink" title="3. 总结"></a>3. 总结</h3><p>JPA是JSR-220标准的一部分，本身并不提供实现，只是统一规范了API，而Hibernate已经支持了JPA标准，所以可以作为其具体实现。</p>
-<p>可以看到JPA使用EntityManager进行的操作和Hibernate使用SessionFactory类似，但因为其是统一的标准，所以如果要更换其实现时，逻辑代码无需改动，只需在配置文件中修改即可，而如果使用的是Hibernate自己的API的话，当要更换ORM框架时，要进行大量的逻辑代码改动。</p>
-<hr>
-<p>作者 [@FateSolo]<br>2017 年 03月 12日</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-5-JPA/" data-id="cj3u4c5hy0023z0la0zdwaj63" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JPA/">JPA</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
 
 
   <nav id="page-nav">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
   </nav>
 </section>
         
@@ -846,7 +854,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Dubbo/" style="font-size: 20px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 17.5px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 15px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 15px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12.5px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 17.5px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 12.5px;">五子棋</a>
+      <a href="/tags/Dubbo/" style="font-size: 20px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 16px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 14px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 14px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 18px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 16px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 12px;">五子棋</a>
     </div>
   </div>
 
@@ -868,6 +876,10 @@
       <ul>
         
           <li>
+            <a href="/2017/06/03/Dubbo-Test-5-Cluster/">Dubbo学习笔记 五：Dubbo服务集群</a>
+          </li>
+        
+          <li>
             <a href="/2017/06/02/Dubbo-Test-4-RESTful/">Dubbo学习笔记 四：支持RESTful Remoting</a>
           </li>
         
@@ -881,10 +893,6 @@
         
           <li>
             <a href="/2017/05/24/Dubbo-Test-1-Maven/">Dubbo学习笔记 一：使用Maven构建多module项目</a>
-          </li>
-        
-          <li>
-            <a href="/2017/05/23/Dubbo-Test-0-Intro/">Dubbo学习笔记 序</a>
           </li>
         
       </ul>
