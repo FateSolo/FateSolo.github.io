@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Dubbo学习笔记 四：支持RESTful Remoting | Fate Solo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="项目地址：https://github.com/FateSolo/Dubbo-Test
+目录：
+0. 序
+1. Maven构建项目
+2. Gradle构建项目
+3. 搭建Spring + Dubbo框架
+4. 支持RESTful Remoting
+
+本章将对dubbo-server进行优化，包括为dubbo协议替换高效二进制序列化实现Kryo和增加RESTful协议（均是当当网维护的Dubbox项">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dubbo学习笔记 四：支持RESTful Remoting">
+<meta property="og:url" content="http://yoursite.com/2017/06/02/Dubbo-Test-4-RESTful/index.html">
+<meta property="og:site_name" content="Fate Solo">
+<meta property="og:description" content="项目地址：https://github.com/FateSolo/Dubbo-Test
+目录：
+0. 序
+1. Maven构建项目
+2. Gradle构建项目
+3. 搭建Spring + Dubbo框架
+4. 支持RESTful Remoting
+
+本章将对dubbo-server进行优化，包括为dubbo协议替换高效二进制序列化实现Kryo和增加RESTful协议（均是当当网维护的Dubbox项">
+<meta property="og:updated_time" content="2017-06-12T12:31:31.883Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dubbo学习笔记 四：支持RESTful Remoting">
+<meta name="twitter:description" content="项目地址：https://github.com/FateSolo/Dubbo-Test
+目录：
+0. 序
+1. Maven构建项目
+2. Gradle构建项目
+3. 搭建Spring + Dubbo框架
+4. 支持RESTful Remoting
+
+本章将对dubbo-server进行优化，包括为dubbo协议替换高效二进制序列化实现Kryo和增加RESTful协议（均是当当网维护的Dubbox项">
+  
+    <link rel="alternate" href="/atom.xml" title="Fate Solo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Fate Solo</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Fate&#39;s Home</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Dubbo-Test-4-RESTful" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/02/Dubbo-Test-4-RESTful/" class="article-date">
+  <time datetime="2017-06-02T07:56:03.000Z" itemprop="datePublished">2017-06-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Dubbo系列/">Dubbo系列</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Dubbo学习笔记 四：支持RESTful Remoting
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<p>项目地址：<br><a href="https://github.com/FateSolo/Dubbo-Test" target="_blank" rel="external">https://github.com/FateSolo/Dubbo-Test</a></p>
+<h3 id="u76EE_u5F55_uFF1A"><a href="#u76EE_u5F55_uFF1A" class="headerlink" title="目录："></a>目录：</h3><ul>
+<li><a href="/2017/05/23/Dubbo-Test-0-Intro/">0. 序</a></li>
+<li><a href="/2017/05/24/Dubbo-Test-1-Maven/">1. Maven构建项目</a></li>
+<li><a href="/2017/05/25/Dubbo-Test-2-Gradle/">2. Gradle构建项目</a></li>
+<li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
+<li><a href="/2017/06/02/Dubbo-Test-4-RESTful/">4. 支持RESTful Remoting</a></li>
+</ul>
+<p>本章将对dubbo-server进行优化，包括为dubbo协议替换高效二进制序列化实现Kryo和增加RESTful协议（均是当当网维护的Dubbox项目所增加的功能）。</p>
+<h3 id="1-__u66FF_u6362_u5E8F_u5217_u5316_u5B9E_u73B0_uFF1A"><a href="#1-__u66FF_u6362_u5E8F_u5217_u5316_u5B9E_u73B0_uFF1A" class="headerlink" title="1. 替换序列化实现："></a>1. 替换序列化实现：</h3><p>dubbo协议采用单一长连接和NIO异步通讯，是Dubbo框架所推荐的协议，其缺省采用Hessian序列化方式。</p>
+<p>Kryo是Dubbox中引入的两个高效序列化实现中的一个（另一个是FST），其性能显著优于Hessian。</p>
+<p>1) 打开dubbo-parent下的build.gradle，添加Kryo的依赖：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">compile <span class="string">'com.esotericsoftware.kryo:kryo:2.24.0'</span></span><br><span class="line">compile <span class="string">'de.javakaffee:kryo-serializers:0.41'</span></span><br></pre></td></tr></table></figure></p>
+<p>2) 在dubbo-api中添加子包serialization，并创建SerializationOptimizerImpl类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.dubbo.api.serialization;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.alibaba.dubbo.common.serialize.support.SerializationOptimizer;</span><br><span class="line"><span class="keyword">import</span> com.fatesolo.dubbo.api.bean.Book;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Collection;</span><br><span class="line"><span class="keyword">import</span> java.util.LinkedList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SerializationOptimizerImpl</span> <span class="keyword">implements</span> <span class="title">SerializationOptimizer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Collection&lt;Class&gt; <span class="title">getSerializableClasses</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        List&lt;Class&gt; classes = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        classes.add(Book.class);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> classes;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>dubbo-api此时没有Dubbo的依赖，因此无法找到SerializationOptimizer接口</p>
+<p>3) 再次打开dubbo-parent下的build.gradle，将对Dubbo 2.8.4的依赖由configure移至subprojects下，令dubbo-api拥有对Dubbo框架的依赖。</p>
+<p>4) 打开dubbo-server.xml，更改dubbo:protocol标签如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">dubbo:protocol</span> <span class="attribute">name</span>=<span class="value">"dubbo"</span> <span class="attribute">port</span>=<span class="value">"20880"</span> <span class="attribute">serialization</span>=<span class="value">"kryo"</span></span><br><span class="line">                <span class="attribute">optimizer</span>=<span class="value">"com.fatesolo.dubbo.api.serialization.SerializationOptimizerImpl"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>至此序列化实现已经切换至Kryo，此后所有需要序列化的类都应该在SerializationOptimizerImpl中添加。</p>
+<h3 id="2-__u589E_u52A0RESTful_u534F_u8BAE_uFF1A"><a href="#2-__u589E_u52A0RESTful_u534F_u8BAE_uFF1A" class="headerlink" title="2. 增加RESTful协议："></a>2. 增加RESTful协议：</h3><p>目前dubbo-server采用了缺省的Dubbo协议，即TCP协议（Netty） + 二进制序列化（Kryo）。</p>
+<p>在Dubbox中增加了对RESTful的支持，即Http协议 + Json，由于此协议能同时支持REST服务和RPC调用，故称为RESTful Remoting。</p>
+<p>1) 打开dubbo-parent下的build.gradle，增加subprojects下的依赖：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">compile <span class="string">'org.jboss.resteasy:resteasy-client:3.1.3.Final'</span></span><br></pre></td></tr></table></figure></p>
+<p>增加configure下的依赖：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">compile <span class="string">'org.jboss.resteasy:resteasy-jackson-provider:3.1.3.Final'</span></span><br></pre></td></tr></table></figure></p>
+<p>2) 打开dubbo-server下的build.gradle，增加如下依赖：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    compile <span class="string">'javax.validation:validation-api:1.0.0.GA'</span></span><br><span class="line"></span><br><span class="line">    compile <span class="string">'org.apache.tomcat.embed:tomcat-embed-core:8.0.11'</span></span><br><span class="line">    compile <span class="string">'org.apache.tomcat.embed:tomcat-embed-logging-juli:8.0.11'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3) 打开dubbo-api下的BookService，更改如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.dubbo.api.service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.fatesolo.dubbo.api.bean.Book;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.ws.rs.*;</span><br><span class="line"><span class="keyword">import</span> javax.ws.rs.core.MediaType;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@Path</span>(<span class="string">"/book"</span>)</span><br><span class="line"><span class="annotation">@Consumes</span>(MediaType.APPLICATION_JSON)</span><br><span class="line"><span class="annotation">@Produces</span>(MediaType.APPLICATION_JSON)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BookService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@GET</span></span><br><span class="line">    <span class="annotation">@Path</span>(<span class="string">"/&#123;id&#125;"</span>)</span><br><span class="line">    <span class="function">Book <span class="title">getBookById</span><span class="params">(@PathParam(<span class="string">"id"</span>)</span> <span class="keyword">int</span> id)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@GET</span></span><br><span class="line">    <span class="annotation">@Path</span>(<span class="string">"/"</span>)</span><br><span class="line">    <span class="function">List&lt;Book&gt; <span class="title">getBooks</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@POST</span></span><br><span class="line">    <span class="annotation">@Path</span>(<span class="string">"/"</span>)</span><br><span class="line">    <span class="function">Boolean <span class="title">addBook</span><span class="params">(Book book)</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里将addBook方法的返回类型由boolean更改为了Boolean，因此同时也要修改dubbo-server中的BookServiceImpl：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Boolean <span class="title">addBook</span><span class="params">(Book book)</span> </span>&#123;</span><br></pre></td></tr></table></figure></p>
+<p>4) 打开dubbo-server.xml，增加一个协议：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">dubbo:protocol</span> <span class="attribute">name</span>=<span class="value">"rest"</span> <span class="attribute">port</span>=<span class="value">"7110"</span> <span class="attribute">server</span>=<span class="value">"tomcat"</span> <span class="attribute">contextpath</span>=<span class="value">"dubbo-server"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>更改BookService使用的协议：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">dubbo:service</span> <span class="attribute">interface</span>=<span class="value">"com.fatesolo.dubbo.api.service.BookService"</span></span><br><span class="line">               <span class="attribute">ref</span>=<span class="value">"bookServiceImpl"</span> <span class="attribute">protocol</span>=<span class="value">"rest"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="3-__u6D4B_u8BD5RESTful_Remoting_uFF1A"><a href="#3-__u6D4B_u8BD5RESTful_Remoting_uFF1A" class="headerlink" title="3. 测试RESTful Remoting："></a>3. 测试RESTful Remoting：</h3><p>1) 分别运行dubbo-server和dubbo-client。</p>
+<p>2) 使用dubbo-client添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -d &#34;name=Book1&#38;author=Fate&#34; http://localhost:8080/dubbo-client/book</span><br></pre></td></tr></table></figure></p>
+<p>3) 访问<a href="http://localhost:8080/dubbo-client/book" target="_blank" rel="external">http://localhost:8080/dubbo-client/book</a> ，得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[&#123;&#34;id&#34;:1,&#34;name&#34;:&#34;Book1&#34;,&#34;author&#34;:&#34;Fate&#34;&#125;]</span><br></pre></td></tr></table></figure></p>
+<p>4) 使用dubbo-server添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -H &#34;Content-Type:application/json&#34; -d &#34;&#123;\&#34;name\&#34;:\&#34;Book2\&#34;,\&#34;author\&#34;:\&#34;Fate\&#34;&#125;&#34; http://localhost:7110/dubbo-server/book</span><br></pre></td></tr></table></figure></p>
+<p>5) 访问<a href="http://localhost:7110/dubbo-server/book" target="_blank" rel="external">http://localhost:7110/dubbo-server/book</a> ，得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[&#123;&#34;id&#34;:1,&#34;name&#34;:&#34;Book1&#34;,&#34;author&#34;:&#34;Fate&#34;&#125;,&#123;&#34;id&#34;:2,&#34;name&#34;:&#34;Book2&#34;,&#34;author&#34;:&#34;Fate&#34;&#125;]</span><br></pre></td></tr></table></figure></p>
+<p>至此，dubbo-server的RESTful协议已经同时支持REST服务和RPC调用。</p>
+<hr>
+<p>作者 [@FateSolo]<br>2017 年 06月 02日</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/06/02/Dubbo-Test-4-RESTful/" data-id="cj3u4c5gr001dz0la8mfbo96r" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/05/31/Dubbo-Test-3-Spring/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Dubbo学习笔记 三：搭建Spring + Dubbo框架</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/DAO系列/">DAO系列</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Dubbo系列/">Dubbo系列</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAX-RS系列/">JAX-RS系列</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SSM框架/">SSM框架</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/五子棋/">五子棋</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hibernate/">Hibernate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JPA/">JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jdbc/">Jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JdbcTemplate/">JdbcTemplate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logback/">Logback</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Dubbo/" style="font-size: 20px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 17.5px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 15px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 15px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12.5px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 17.5px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 12.5px;">五子棋</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/06/02/Dubbo-Test-4-RESTful/">Dubbo学习笔记 四：支持RESTful Remoting</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/31/Dubbo-Test-3-Spring/">Dubbo学习笔记 三：搭建Spring + Dubbo框架</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/25/Dubbo-Test-2-Gradle/">Dubbo学习笔记 二：使用Gradle构建多module项目</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/24/Dubbo-Test-1-Maven/">Dubbo学习笔记 一：使用Maven构建多module项目</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/23/Dubbo-Test-0-Intro/">Dubbo学习笔记 序</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 FateSolo<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+  </div>
+</body>
+</html>

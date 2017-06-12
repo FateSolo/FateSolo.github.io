@@ -66,6 +66,83 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Dubbo-Test-4-RESTful" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/02/Dubbo-Test-4-RESTful/" class="article-date">
+  <time datetime="2017-06-02T07:56:03.000Z" itemprop="datePublished">2017-06-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Dubbo系列/">Dubbo系列</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/06/02/Dubbo-Test-4-RESTful/">Dubbo学习笔记 四：支持RESTful Remoting</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<p>项目地址：<br><a href="https://github.com/FateSolo/Dubbo-Test" target="_blank" rel="external">https://github.com/FateSolo/Dubbo-Test</a></p>
+<h3 id="u76EE_u5F55_uFF1A"><a href="#u76EE_u5F55_uFF1A" class="headerlink" title="目录："></a>目录：</h3><ul>
+<li><a href="/2017/05/23/Dubbo-Test-0-Intro/">0. 序</a></li>
+<li><a href="/2017/05/24/Dubbo-Test-1-Maven/">1. Maven构建项目</a></li>
+<li><a href="/2017/05/25/Dubbo-Test-2-Gradle/">2. Gradle构建项目</a></li>
+<li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
+<li><a href="/2017/06/02/Dubbo-Test-4-RESTful/">4. 支持RESTful Remoting</a></li>
+</ul>
+<p>本章将对dubbo-server进行优化，包括为dubbo协议替换高效二进制序列化实现Kryo和增加RESTful协议（均是当当网维护的Dubbox项目所增加的功能）。</p>
+<h3 id="1-__u66FF_u6362_u5E8F_u5217_u5316_u5B9E_u73B0_uFF1A"><a href="#1-__u66FF_u6362_u5E8F_u5217_u5316_u5B9E_u73B0_uFF1A" class="headerlink" title="1. 替换序列化实现："></a>1. 替换序列化实现：</h3><p>dubbo协议采用单一长连接和NIO异步通讯，是Dubbo框架所推荐的协议，其缺省采用Hessian序列化方式。</p>
+<p>Kryo是Dubbox中引入的两个高效序列化实现中的一个（另一个是FST），其性能显著优于Hessian。</p>
+<p>1) 打开dubbo-parent下的build.gradle，添加Kryo的依赖：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">compile <span class="string">'com.esotericsoftware.kryo:kryo:2.24.0'</span></span><br><span class="line">compile <span class="string">'de.javakaffee:kryo-serializers:0.41'</span></span><br></pre></td></tr></table></figure></p>
+<p>2) 在dubbo-api中添加子包serialization，并创建SerializationOptimizerImpl类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.dubbo.api.serialization;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.alibaba.dubbo.common.serialize.support.SerializationOptimizer;</span><br><span class="line"><span class="keyword">import</span> com.fatesolo.dubbo.api.bean.Book;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Collection;</span><br><span class="line"><span class="keyword">import</span> java.util.LinkedList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SerializationOptimizerImpl</span> <span class="keyword">implements</span> <span class="title">SerializationOptimizer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Collection&lt;Class&gt; <span class="title">getSerializableClasses</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        List&lt;Class&gt; classes = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        classes.add(Book.class);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> classes;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>dubbo-api此时没有Dubbo的依赖，因此无法找到SerializationOptimizer接口</p>
+<p>3) 再次打开dubbo-parent下的build.gradle，将对Dubbo 2.8.4的依赖由configure移至subprojects下，令dubbo-api拥有对Dubbo框架的依赖。</p>
+<p>4) 打开dubbo-server.xml，更改dubbo:protocol标签如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">dubbo:protocol</span> <span class="attribute">name</span>=<span class="value">"dubbo"</span> <span class="attribute">port</span>=<span class="value">"20880"</span> <span class="attribute">serialization</span>=<span class="value">"kryo"</span></span><br><span class="line">                <span class="attribute">optimizer</span>=<span class="value">"com.fatesolo.dubbo.api.serialization.SerializationOptimizerImpl"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>至此序列化实现已经切换至Kryo，此后所有需要序列化的类都应该在SerializationOptimizerImpl中添加。</p>
+<h3 id="2-__u589E_u52A0RESTful_u534F_u8BAE_uFF1A"><a href="#2-__u589E_u52A0RESTful_u534F_u8BAE_uFF1A" class="headerlink" title="2. 增加RESTful协议："></a>2. 增加RESTful协议：</h3><p>目前dubbo-server采用了缺省的Dubbo协议，即TCP协议（Netty） + 二进制序列化（Kryo）。</p>
+<p>在Dubbox中增加了对RESTful的支持，即Http协议 + Json，由于此协议能同时支持REST服务和RPC调用，故称为RESTful Remoting。</p>
+<p>1) 打开dubbo-parent下的build.gradle，增加subprojects下的依赖：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">compile <span class="string">'org.jboss.resteasy:resteasy-client:3.1.3.Final'</span></span><br></pre></td></tr></table></figure></p>
+<p>增加configure下的依赖：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">compile <span class="string">'org.jboss.resteasy:resteasy-jackson-provider:3.1.3.Final'</span></span><br></pre></td></tr></table></figure></p>
+<p>2) 打开dubbo-server下的build.gradle，增加如下依赖：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    compile <span class="string">'javax.validation:validation-api:1.0.0.GA'</span></span><br><span class="line"></span><br><span class="line">    compile <span class="string">'org.apache.tomcat.embed:tomcat-embed-core:8.0.11'</span></span><br><span class="line">    compile <span class="string">'org.apache.tomcat.embed:tomcat-embed-logging-juli:8.0.11'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3) 打开dubbo-api下的BookService，更改如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.dubbo.api.service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.fatesolo.dubbo.api.bean.Book;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.ws.rs.*;</span><br><span class="line"><span class="keyword">import</span> javax.ws.rs.core.MediaType;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@Path</span>(<span class="string">"/book"</span>)</span><br><span class="line"><span class="annotation">@Consumes</span>(MediaType.APPLICATION_JSON)</span><br><span class="line"><span class="annotation">@Produces</span>(MediaType.APPLICATION_JSON)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BookService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@GET</span></span><br><span class="line">    <span class="annotation">@Path</span>(<span class="string">"/&#123;id&#125;"</span>)</span><br><span class="line">    <span class="function">Book <span class="title">getBookById</span><span class="params">(@PathParam(<span class="string">"id"</span>)</span> <span class="keyword">int</span> id)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@GET</span></span><br><span class="line">    <span class="annotation">@Path</span>(<span class="string">"/"</span>)</span><br><span class="line">    <span class="function">List&lt;Book&gt; <span class="title">getBooks</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@POST</span></span><br><span class="line">    <span class="annotation">@Path</span>(<span class="string">"/"</span>)</span><br><span class="line">    <span class="function">Boolean <span class="title">addBook</span><span class="params">(Book book)</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里将addBook方法的返回类型由boolean更改为了Boolean，因此同时也要修改dubbo-server中的BookServiceImpl：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Boolean <span class="title">addBook</span><span class="params">(Book book)</span> </span>&#123;</span><br></pre></td></tr></table></figure></p>
+<p>4) 打开dubbo-server.xml，增加一个协议：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">dubbo:protocol</span> <span class="attribute">name</span>=<span class="value">"rest"</span> <span class="attribute">port</span>=<span class="value">"7110"</span> <span class="attribute">server</span>=<span class="value">"tomcat"</span> <span class="attribute">contextpath</span>=<span class="value">"dubbo-server"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>更改BookService使用的协议：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">dubbo:service</span> <span class="attribute">interface</span>=<span class="value">"com.fatesolo.dubbo.api.service.BookService"</span></span><br><span class="line">               <span class="attribute">ref</span>=<span class="value">"bookServiceImpl"</span> <span class="attribute">protocol</span>=<span class="value">"rest"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="3-__u6D4B_u8BD5RESTful_Remoting_uFF1A"><a href="#3-__u6D4B_u8BD5RESTful_Remoting_uFF1A" class="headerlink" title="3. 测试RESTful Remoting："></a>3. 测试RESTful Remoting：</h3><p>1) 分别运行dubbo-server和dubbo-client。</p>
+<p>2) 使用dubbo-client添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -d &#34;name=Book1&#38;author=Fate&#34; http://localhost:8080/dubbo-client/book</span><br></pre></td></tr></table></figure></p>
+<p>3) 访问<a href="http://localhost:8080/dubbo-client/book" target="_blank" rel="external">http://localhost:8080/dubbo-client/book</a> ，得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[&#123;&#34;id&#34;:1,&#34;name&#34;:&#34;Book1&#34;,&#34;author&#34;:&#34;Fate&#34;&#125;]</span><br></pre></td></tr></table></figure></p>
+<p>4) 使用dubbo-server添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -H &#34;Content-Type:application/json&#34; -d &#34;&#123;\&#34;name\&#34;:\&#34;Book2\&#34;,\&#34;author\&#34;:\&#34;Fate\&#34;&#125;&#34; http://localhost:7110/dubbo-server/book</span><br></pre></td></tr></table></figure></p>
+<p>5) 访问<a href="http://localhost:7110/dubbo-server/book" target="_blank" rel="external">http://localhost:7110/dubbo-server/book</a> ，得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[&#123;&#34;id&#34;:1,&#34;name&#34;:&#34;Book1&#34;,&#34;author&#34;:&#34;Fate&#34;&#125;,&#123;&#34;id&#34;:2,&#34;name&#34;:&#34;Book2&#34;,&#34;author&#34;:&#34;Fate&#34;&#125;]</span><br></pre></td></tr></table></figure></p>
+<p>至此，dubbo-server的RESTful协议已经同时支持REST服务和RPC调用。</p>
+<hr>
+<p>作者 [@FateSolo]<br>2017 年 06月 02日</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/06/02/Dubbo-Test-4-RESTful/" data-id="cj3u4c5gr001dz0la8mfbo96r" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Dubbo-Test-3-Spring" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/05/31/Dubbo-Test-3-Spring/" class="article-date">
@@ -99,6 +176,7 @@
 <li><a href="/2017/05/24/Dubbo-Test-1-Maven/">1. Maven构建项目</a></li>
 <li><a href="/2017/05/25/Dubbo-Test-2-Gradle/">2. Gradle构建项目</a></li>
 <li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
+<li><a href="/2017/06/02/Dubbo-Test-4-RESTful/">4. 支持RESTful Remoting</a></li>
 </ul>
 <p>在本章将继续使用上一章的Gradle项目，搭建一个基于Spring + Dubbo框架的分布式服务。</p>
 <h3 id="1-__u9879_u76EE_u5BFC_u5165_uFF1A"><a href="#1-__u9879_u76EE_u5BFC_u5165_uFF1A" class="headerlink" title="1. 项目导入："></a>1. 项目导入：</h3><p>使用Intellij IDEA作为项目IDE，以提高工作效率。</p>
@@ -142,7 +220,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/31/Dubbo-Test-3-Spring/" data-id="cj3sx4y8t001dumla74ch3v87" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/31/Dubbo-Test-3-Spring/" data-id="cj3u4c5gz001jz0lai7o7mca9" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
@@ -187,6 +265,7 @@
 <li><a href="/2017/05/24/Dubbo-Test-1-Maven/">1. Maven构建项目</a></li>
 <li><a href="/2017/05/25/Dubbo-Test-2-Gradle/">2. Gradle构建项目</a></li>
 <li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
+<li><a href="/2017/06/02/Dubbo-Test-4-RESTful/">4. 支持RESTful Remoting</a></li>
 </ul>
 <p>在本章将用Gradle重新构建多module项目Dubbo-Test，以展示和Maven的区别。</p>
 <h3 id="1-__u9879_u76EE_u521B_u5EFA_uFF1A"><a href="#1-__u9879_u76EE_u521B_u5EFA_uFF1A" class="headerlink" title="1. 项目创建："></a>1. 项目创建：</h3><p>1) 创建名为Dubbo-Test的文件夹并进入：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir Dubbo-Test &#38;&#38; cd Dubbo-Test</span><br></pre></td></tr></table></figure></p>
@@ -211,10 +290,10 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/25/Dubbo-Test-2-Gradle/" data-id="cj3sx4y90001jumla1ln1vzv7" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/25/Dubbo-Test-2-Gradle/" data-id="cj3u4c5h6001nz0la2jl59kr4" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gradle/">Gradle</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gradle/">Gradle</a></li></ul>
 
     </footer>
   </div>
@@ -256,6 +335,7 @@
 <li><a href="/2017/05/24/Dubbo-Test-1-Maven/">1. Maven构建项目</a></li>
 <li><a href="/2017/05/25/Dubbo-Test-2-Gradle/">2. Gradle构建项目</a></li>
 <li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
+<li><a href="/2017/06/02/Dubbo-Test-4-RESTful/">4. 支持RESTful Remoting</a></li>
 </ul>
 <p>对于一个使用了Dubbo的分布式应用，其可以拆分成三个部分：</p>
 <p>dubbo-api，服务公共api，包含服务接口、实体等server、client公用的类。<br>dubbo-server，服务提供者，实现api的服务接口，提供具体服务。<br>dubbo-client，服务消费者，使用api提供的接口，远程调用server端服务。</p>
@@ -284,10 +364,10 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/24/Dubbo-Test-1-Maven/" data-id="cj3sx4y96001numlat6g75nh1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/24/Dubbo-Test-1-Maven/" data-id="cj3u4c5hd001sz0lacx42jhdz" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven/">Maven</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven/">Maven</a></li></ul>
 
     </footer>
   </div>
@@ -329,6 +409,7 @@
 <li><a href="/2017/05/24/Dubbo-Test-1-Maven/">1. Maven构建项目</a></li>
 <li><a href="/2017/05/25/Dubbo-Test-2-Gradle/">2. Gradle构建项目</a></li>
 <li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
+<li><a href="/2017/06/02/Dubbo-Test-4-RESTful/">4. 支持RESTful Remoting</a></li>
 </ul>
 <p>Dubbo是一个分布式服务框架，致力于提供高性能和透明化的RPC远程服务调用方案，是阿里巴巴SOA服务化治理方案的核心框架，但目前已经停止更新。</p>
 <p>Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用、基于Kryo和FST的Java高效序列化实现等功能。</p>
@@ -353,7 +434,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/23/Dubbo-Test-0-Intro/" data-id="cj3sx4y9a001rumlai9atjftt" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/23/Dubbo-Test-0-Intro/" data-id="cj3u4c5hm001xz0laz1buohn1" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li></ul>
@@ -438,7 +519,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-3-Other/" data-id="cj3sx4y80000kumlat9y8nmqk" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-3-Other/" data-id="cj3u4c5fp000kz0lao8fxg09p" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Logback/">Logback</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li></ul>
@@ -509,7 +590,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-2-Spring/" data-id="cj3sx4y89000uumla4wg8p9ny" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-2-Spring/" data-id="cj3u4c5g2000uz0layec0pn4m" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li></ul>
@@ -585,7 +666,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-1-Jersey/" data-id="cj3sx4y8f0011umla0a0kgdld" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-1-Jersey/" data-id="cj3u4c5g80011z0lapdvnskix" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jersey/">Jersey</a></li></ul>
@@ -654,7 +735,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-6-SpringDataJPA/" data-id="cj3sx4y9g001uumlasg5e1m6o" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-6-SpringDataJPA/" data-id="cj3u4c5hr0020z0la8f50hkix" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li></ul>
@@ -720,77 +801,10 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-5-JPA/" data-id="cj3sx4y9l001xumlaugyw7yi7" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-5-JPA/" data-id="cj3u4c5hy0023z0la0zdwaj63" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JPA/">JPA</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-DAO-Test-4-Hibernate" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/03/12/DAO-Test-4-Hibernate/" class="article-date">
-  <time datetime="2017-03-12T14:05:42.000Z" itemprop="datePublished">2017-03-12</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/DAO系列/">DAO系列</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/12/DAO-Test-4-Hibernate/">DAO层实现示例 四：Hibernate框架</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <hr>
-<p>项目地址：<br><a href="https://github.com/FateSolo/DAO-Test" target="_blank" rel="external">https://github.com/FateSolo/DAO-Test</a></p>
-<h3 id="u76EE_u5F55_uFF1A"><a href="#u76EE_u5F55_uFF1A" class="headerlink" title="目录："></a>目录：</h3><ul>
-<li><a href="/2017/03/12/DAO-Test-0-Intro/">0. 项目搭建</a></li>
-<li><a href="/2017/03/12/DAO-Test-1-Jdbc/">1. 原生Jdbc</a></li>
-<li><a href="/2017/03/12/DAO-Test-2-JdbcTemplate/">2. JdbcTemplate</a></li>
-<li><a href="/2017/03/12/DAO-Test-3-Mybatis/">3. Mybatis</a></li>
-<li><a href="/2017/03/12/DAO-Test-4-Hibernate/">4. Hibernate</a></li>
-<li><a href="/2017/03/12/DAO-Test-5-JPA/">5. JPA</a></li>
-<li><a href="/2017/03/12/DAO-Test-6-SpringDataJPA/">6. Spring-Data-JPA</a></li>
-</ul>
-<p>该系列文章将展示六种不同的DAO层实现方法并总结其不同，本章使用Hibernate框架完成DAO操作。</p>
-<h3 id="1-__u793A_u4F8B_u4EE3_u7801_uFF1A"><a href="#1-__u793A_u4F8B_u4EE3_u7801_uFF1A" class="headerlink" title="1. 示例代码："></a>1. 示例代码：</h3><p>1) 在spring-common.xml中，配置Hibernate：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- Hibernate --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"sessionFactory"</span> <span class="attribute">class</span>=<span class="value">"org.springframework.orm.hibernate5.LocalSessionFactoryBean"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"dataSource"</span> <span class="attribute">ref</span>=<span class="value">"dataSource"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"packagesToScan"</span> <span class="attribute">value</span>=<span class="value">"com.fatesolo.entity"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"hibernateProperties"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">props</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">prop</span> <span class="attribute">key</span>=<span class="value">"hibernate.dialect"</span>&gt;</span>org.hibernate.dialect.MySQL5Dialect<span class="tag">&lt;/<span class="title">prop</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">prop</span> <span class="attribute">key</span>=<span class="value">"hibernate.show_sql"</span>&gt;</span>true<span class="tag">&lt;/<span class="title">prop</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">prop</span> <span class="attribute">key</span>=<span class="value">"hibernate.format_sql"</span>&gt;</span>true<span class="tag">&lt;/<span class="title">prop</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">prop</span> <span class="attribute">key</span>=<span class="value">"hibernate.hbm2ddl.auto"</span>&gt;</span>update<span class="tag">&lt;/<span class="title">prop</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="title">props</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>注释掉原先的事务管理器txManager，并配置Hibernate的事务管理器transactionManager<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 配置 Hibernate 事务 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"transactionManager"</span> <span class="attribute">class</span>=<span class="value">"org.springframework.orm.hibernate5.HibernateTransactionManager"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"sessionFactory"</span> <span class="attribute">ref</span>=<span class="value">"sessionFactory"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">tx:annotation-driven</span> <span class="attribute">transaction-manager</span>=<span class="value">"transactionManager"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>2) 在build.gradle中，添加Hibernate依赖：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">compile &#39;org.hibernate:hibernate-core:5.2.7.Final&#39;</span><br></pre></td></tr></table></figure></p>
-<p>3) 在dao.impl包中创建BookDaoHibernateImpl.java，编写如下代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.dao.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.fatesolo.dao.BookDao;</span><br><span class="line"><span class="keyword">import</span> com.fatesolo.entity.Book;</span><br><span class="line"><span class="keyword">import</span> org.hibernate.SessionFactory;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Repository;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.annotation.Resource;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@Repository</span>(<span class="string">"bookDaoHibernateImpl"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BookDaoHibernateImpl</span> <span class="keyword">implements</span> <span class="title">BookDao</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> SessionFactory sessionFactory;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Book <span class="title">findById</span><span class="params">(<span class="keyword">int</span> id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sessionFactory.getCurrentSession().get(Book.class, id);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Book&gt; <span class="title">findByNameContaining</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sessionFactory.getCurrentSession()</span><br><span class="line">                .createQuery(<span class="string">"from Book where name like ?"</span>, Book.class)</span><br><span class="line">                .setParameter(<span class="number">0</span>, <span class="string">"%"</span> + name + <span class="string">"%"</span>)</span><br><span class="line">                .list();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">save</span><span class="params">(Book book)</span> </span>&#123;</span><br><span class="line">        sessionFactory.getCurrentSession().save(book);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>4) 打开Book.java，修改代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.entity;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.persistence.*;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@Entity</span></span><br><span class="line"><span class="annotation">@Table</span>(name = <span class="string">"book"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Id</span></span><br><span class="line">    <span class="annotation">@GeneratedValue</span>(strategy = GenerationType.IDENTITY)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Column</span>(nullable = <span class="keyword">false</span>)</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Column</span>(nullable = <span class="keyword">false</span>)</span><br><span class="line">    <span class="keyword">private</span> String author;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">(<span class="keyword">int</span> id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.id = id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getAuthor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> author;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAuthor</span><span class="params">(String author)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.author = author;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"Book&#123;"</span> +</span><br><span class="line">                <span class="string">"id="</span> + id +</span><br><span class="line">                <span class="string">", name='"</span> + name + <span class="string">'\''</span> +</span><br><span class="line">                <span class="string">", author='"</span> + author + <span class="string">'\''</span> +</span><br><span class="line">                <span class="string">'&#125;'</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>5) 打开BookService.java，修改成员变量bookDao的注解：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@Resource</span>(name = <span class="string">"bookDaoHibernateImpl"</span>)</span><br></pre></td></tr></table></figure></p>
-<h3 id="2-__u9879_u76EE_u8FD0_u884C_uFF1A"><a href="#2-__u9879_u76EE_u8FD0_u884C_uFF1A" class="headerlink" title="2. 项目运行："></a>2. 项目运行：</h3><p>1) 使用Tomcat 8运行项目，使用curl工具添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -d &#34;name=Test4&#38;author=Fate&#34; http://localhost:8080/book</span><br></pre></td></tr></table></figure></p>
-<p>得到如下返回：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book&#123;id=4, name=&#39;Test4&#39;, author=&#39;Fate&#39;&#125;</span><br></pre></td></tr></table></figure></p>
-<p>2) 访问<a href="http://localhost:8080/book/4" target="_blank" rel="external">http://localhost:8080/book/4</a> ，得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book&#123;id=4, name=&#39;Test4&#39;, author=&#39;Fate&#39;&#125;</span><br></pre></td></tr></table></figure></p>
-<p>3) 访问<a href="http://localhost:8080/book/name/Test" target="_blank" rel="external">http://localhost:8080/book/name/Test</a> ，得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Book&#123;id=1, name=&#39;Test1&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=2, name=&#39;Test2&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=3, name=&#39;Test3&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=4, name=&#39;Test4&#39;, author=&#39;Fate&#39;&#125;]</span><br></pre></td></tr></table></figure></p>
-<h3 id="3-__u603B_u7ED3"><a href="#3-__u603B_u7ED3" class="headerlink" title="3. 总结"></a>3. 总结</h3><p>Hibernate是经典的ORM框架，使用Hibernate，彻底完成了实体与表的映射，开发者无需再编写sql (某些情况下仍需要编写少量的hql语句)。</p>
-<hr>
-<p>作者 [@FateSolo]<br>2017 年 03月 12日</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-4-Hibernate/" data-id="cj3sx4y9p0021umlavw2i1g2m" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hibernate/">Hibernate</a></li></ul>
 
     </footer>
   </div>
@@ -832,7 +846,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Dubbo/" style="font-size: 12.5px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 15px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 15px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 15px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12.5px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 17.5px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 12.5px;">五子棋</a>
+      <a href="/tags/Dubbo/" style="font-size: 20px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 17.5px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 15px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 15px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12.5px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 17.5px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 12.5px;">五子棋</a>
     </div>
   </div>
 
@@ -841,7 +855,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a></li></ul>
     </div>
   </div>
 
@@ -852,6 +866,10 @@
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2017/06/02/Dubbo-Test-4-RESTful/">Dubbo学习笔记 四：支持RESTful Remoting</a>
+          </li>
         
           <li>
             <a href="/2017/05/31/Dubbo-Test-3-Spring/">Dubbo学习笔记 三：搭建Spring + Dubbo框架</a>
@@ -867,10 +885,6 @@
         
           <li>
             <a href="/2017/05/23/Dubbo-Test-0-Intro/">Dubbo学习笔记 序</a>
-          </li>
-        
-          <li>
-            <a href="/2017/03/22/JSH-Test-3-Other/">JAX-RS初探 三：其他</a>
           </li>
         
       </ul>

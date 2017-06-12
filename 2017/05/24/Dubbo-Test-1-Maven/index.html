@@ -11,9 +11,10 @@
 1. Maven构建项目
 2. Gradle构建项目
 3. 搭建Spring + Dubbo框架
+4. 支持RESTful Remoting
 
 对于一个使用了Dubbo的分布式应用，其可以拆分成三个部分：
-dubbo-api，服务公共api，包含服务接口、实体等server、client公用的类。dubbo-server，服务提供者，实">
+dubbo-api，服务公共api，包含服务接口、实体等server、client公用的">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Dubbo学习笔记 一：使用Maven构建多module项目">
 <meta property="og:url" content="http://yoursite.com/2017/05/24/Dubbo-Test-1-Maven/index.html">
@@ -24,10 +25,11 @@ dubbo-api，服务公共api，包含服务接口、实体等server、client公�
 1. Maven构建项目
 2. Gradle构建项目
 3. 搭建Spring + Dubbo框架
+4. 支持RESTful Remoting
 
 对于一个使用了Dubbo的分布式应用，其可以拆分成三个部分：
-dubbo-api，服务公共api，包含服务接口、实体等server、client公用的类。dubbo-server，服务提供者，实">
-<meta property="og:updated_time" content="2017-06-11T13:13:28.994Z">
+dubbo-api，服务公共api，包含服务接口、实体等server、client公用的">
+<meta property="og:updated_time" content="2017-06-12T08:01:27.040Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dubbo学习笔记 一：使用Maven构建多module项目">
 <meta name="twitter:description" content="项目地址：https://github.com/FateSolo/Dubbo-Test
@@ -36,9 +38,10 @@ dubbo-api，服务公共api，包含服务接口、实体等server、client公�
 1. Maven构建项目
 2. Gradle构建项目
 3. 搭建Spring + Dubbo框架
+4. 支持RESTful Remoting
 
 对于一个使用了Dubbo的分布式应用，其可以拆分成三个部分：
-dubbo-api，服务公共api，包含服务接口、实体等server、client公用的类。dubbo-server，服务提供者，实">
+dubbo-api，服务公共api，包含服务接口、实体等server、client公用的">
   
     <link rel="alternate" href="/atom.xml" title="Fate Solo" type="application/atom+xml">
   
@@ -122,6 +125,7 @@ dubbo-api，服务公共api，包含服务接口、实体等server、client公�
 <li><a href="/2017/05/24/Dubbo-Test-1-Maven/">1. Maven构建项目</a></li>
 <li><a href="/2017/05/25/Dubbo-Test-2-Gradle/">2. Gradle构建项目</a></li>
 <li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
+<li><a href="/2017/06/02/Dubbo-Test-4-RESTful/">4. 支持RESTful Remoting</a></li>
 </ul>
 <p>对于一个使用了Dubbo的分布式应用，其可以拆分成三个部分：</p>
 <p>dubbo-api，服务公共api，包含服务接口、实体等server、client公用的类。<br>dubbo-server，服务提供者，实现api的服务接口，提供具体服务。<br>dubbo-client，服务消费者，使用api提供的接口，远程调用server端服务。</p>
@@ -150,10 +154,10 @@ dubbo-api，服务公共api，包含服务接口、实体等server、client公�
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/24/Dubbo-Test-1-Maven/" data-id="cj3sx4y96001numlat6g75nh1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/24/Dubbo-Test-1-Maven/" data-id="cj3u4c5hd001sz0lacx42jhdz" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven/">Maven</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven/">Maven</a></li></ul>
 
     </footer>
   </div>
@@ -209,7 +213,7 @@ dubbo-api，服务公共api，包含服务接口、实体等server、client公�
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Dubbo/" style="font-size: 12.5px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 15px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 15px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 15px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12.5px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 17.5px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 12.5px;">五子棋</a>
+      <a href="/tags/Dubbo/" style="font-size: 20px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 17.5px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 15px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 15px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 20px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12.5px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 17.5px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 12.5px;">五子棋</a>
     </div>
   </div>
 
@@ -218,7 +222,7 @@ dubbo-api，服务公共api，包含服务接口、实体等server、client公�
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a></li></ul>
     </div>
   </div>
 
@@ -229,6 +233,10 @@ dubbo-api，服务公共api，包含服务接口、实体等server、client公�
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2017/06/02/Dubbo-Test-4-RESTful/">Dubbo学习笔记 四：支持RESTful Remoting</a>
+          </li>
         
           <li>
             <a href="/2017/05/31/Dubbo-Test-3-Spring/">Dubbo学习笔记 三：搭建Spring + Dubbo框架</a>
@@ -244,10 +252,6 @@ dubbo-api，服务公共api，包含服务接口、实体等server、client公�
         
           <li>
             <a href="/2017/05/23/Dubbo-Test-0-Intro/">Dubbo学习笔记 序</a>
-          </li>
-        
-          <li>
-            <a href="/2017/03/22/JSH-Test-3-Other/">JAX-RS初探 三：其他</a>
           </li>
         
       </ul>
