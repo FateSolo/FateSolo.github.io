@@ -66,6 +66,200 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Five-Chess-Client" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/02/06/Five-Chess-Client/" class="article-date">
+  <time datetime="2016-02-06T06:25:48.000Z" itemprop="datePublished">2016-02-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/五子棋/">五子棋</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/02/06/Five-Chess-Client/">网络智能五子棋博弈系统的客户端说明</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<p>大学生创新项目：网络智能五子棋博弈系统的研究与实现</p>
+<p>项目说明：实现了C/S架构的五子棋游戏，支持双人对弈、人机对弈等功能</p>
+<p>服务器端代码开源：<a href="https://github.com/FateSolo/FiveChessServer" target="_blank" rel="external">https://github.com/FateSolo/FiveChessServer</a></p>
+<p>客户端代码开源：<a href="https://github.com/FateSolo/FiveChessClient" target="_blank" rel="external">https://github.com/FateSolo/FiveChessClient</a></p>
+<p>本篇文章是对客户端程序的简要说明。</p>
+<h3 id="1-__u9879_u76EE_u5F00_u53D1_u73AF_u5883_uFF1A"><a href="#1-__u9879_u76EE_u5F00_u53D1_u73AF_u5883_uFF1A" class="headerlink" title="1. 项目开发环境："></a>1. 项目开发环境：</h3><ul>
+<li>Windows 8.1</li>
+<li>Visual Studio 2013</li>
+<li>Qt Creator 3.3.0</li>
+</ul>
+<h3 id="2-__u603B_u4F53_u8BF4_u660E_uFF1A"><a href="#2-__u603B_u4F53_u8BF4_u660E_uFF1A" class="headerlink" title="2. 总体说明："></a>2. 总体说明：</h3><ul>
+<li><p>主要使用C++实现客户端逻辑功能</p>
+</li>
+<li><p>应用了Qt框架完成对图形界面、网络功能的编写</p>
+</li>
+</ul>
+<h3 id="3-__u8FD0_u884C_u73AF_u5883_u90E8_u7F72_uFF1A"><a href="#3-__u8FD0_u884C_u73AF_u5883_u90E8_u7F72_uFF1A" class="headerlink" title="3. 运行环境部署："></a>3. 运行环境部署：</h3><p>这里以Windows 8.1为例</p>
+<p>1、请确保系统中已经安装了Visual Studio或者MinGW</p>
+<p>2、前往<a href="http://www.qt.io/download-open-source/#section-2下载对应的Qt" target="_blank" rel="external">http://www.qt.io/download-open-source/#section-2下载对应的Qt</a></p>
+<p>3、安装Github客户端（如果可以从其他地方获取到源文件，例如大创光盘，那么请忽略第3、4步）</p>
+<p>4、使用Github客户端克隆FiveChessClient(请先将github.com/FateSolo下的FiveChessClient项目Fork到你自己的账号)，<br>或者使用Git Bash克隆(注意将name替换成你的用户名)</p>
+<pre><code>$ git clone git@github.com:name/FiveChessClient.git
+</code></pre><p>5、打开Qt Creator，导入FiveChessClient，运行</p>
+<p>6、在FiveChessClient的父目录中找到构建后的文件夹，进去拷贝出FiveChessClient.exe，存放到单独的文件夹中，这里命名为FiveChess</p>
+<p>7、从FiveChessClient文件夹中将config.ini和music文件夹拷贝到FiveChess文件夹中</p>
+<p>8、前往Qt的安装目录 Qt\Qt5.4.0\5.4\msvc2013_64\bin，拷贝出icudt53.dll、icuin53.dll、icuuc53.dll、Qt5Core.dll、Qt5Gui.dll、Qt5Multimedia.dll、Qt5Network.dll、Qt5Widgets.dll到FiveChess中</p>
+<p>9、前往Qt\Qt5.4.0\5.4\msvc2013_64\plugins，拷贝出imageformats、mediaservice、platforms文件夹到FiveChess中</p>
+<p>10、上网下载或从本地找到msvcp120.dll、msvcr120.dll拷贝至FiveChess中</p>
+<p>11、打开FiveChess文件夹中的config.ini文件，修改ip为你刚才部署的服务器的ip地址</p>
+<p>12、运行FiveChessClient.exe即可</p>
+<hr>
+<p>作者 [@FateSolo]<br>2016 年 2月 6日</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/02/06/Five-Chess-Client/" data-id="cj3vw714e001agvla7h17s4kf" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Five-Chess-Server" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/02/06/Five-Chess-Server/" class="article-date">
+  <time datetime="2016-02-06T06:25:39.000Z" itemprop="datePublished">2016-02-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/五子棋/">五子棋</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/02/06/Five-Chess-Server/">网络智能五子棋博弈系统的服务器端说明</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<p>大学生创新项目：网络智能五子棋博弈系统的研究与实现</p>
+<p>项目说明：实现了C/S架构的五子棋游戏，支持双人对弈、人机对弈等功能</p>
+<p>服务器端代码开源：<a href="https://github.com/FateSolo/FiveChessServer" target="_blank" rel="external">https://github.com/FateSolo/FiveChessServer</a></p>
+<p>客户端代码开源：<a href="https://github.com/FateSolo/FiveChessClient" target="_blank" rel="external">https://github.com/FateSolo/FiveChessClient</a></p>
+<p>本篇文章是对服务器端程序的简要说明。</p>
+<h3 id="1-__u9879_u76EE_u5F00_u53D1_u73AF_u5883_uFF1A"><a href="#1-__u9879_u76EE_u5F00_u53D1_u73AF_u5883_uFF1A" class="headerlink" title="1. 项目开发环境："></a>1. 项目开发环境：</h3><ul>
+<li>Ubuntu 14.04.3</li>
+<li>Pycharm 5.0.3</li>
+<li>Python 2.7.6</li>
+<li>G++ 4.8.4</li>
+<li>MySQL 5.5</li>
+</ul>
+<h3 id="2-__u603B_u4F53_u8BF4_u660E_uFF1A"><a href="#2-__u603B_u4F53_u8BF4_u660E_uFF1A" class="headerlink" title="2. 总体说明："></a>2. 总体说明：</h3><ul>
+<li><p>主要使用Python实现后台逻辑功能</p>
+</li>
+<li><p>应用了基于事件驱动的Twisted作为服务器框架</p>
+</li>
+<li><p>与五子棋AI相关的模块则使用C++编写，由G++编译成动态链接库(.so)，Python使用ctypes调用动态库内的函数</p>
+</li>
+<li><p>使用MySQLdb完成对MySQL数据库的操作</p>
+</li>
+</ul>
+<h3 id="3-__u4E94_u5B50_u68CBAI_u76F8_u5173_u6A21_u5757_u8BF4_u660E_uFF1A"><a href="#3-__u4E94_u5B50_u68CBAI_u76F8_u5173_u6A21_u5757_u8BF4_u660E_uFF1A" class="headerlink" title="3. 五子棋AI相关模块说明："></a>3. 五子棋AI相关模块说明：</h3><ul>
+<li><p>核心AI：FiveChessAI.so (负极大值算法 + AlphaBeta剪枝 + 历史启发 + 置换表 + 限制搜索边框)</p>
+</li>
+<li><p>判断胜负：FiveChessRule.so</p>
+</li>
+<li><p>连五威胁评判：ThreatJudgement.so</p>
+</li>
+<li><p>具体源码存放在 FiveChessAI/ 文件夹内</p>
+</li>
+</ul>
+<h3 id="4-__u8FD0_u884C_u73AF_u5883_u90E8_u7F72_uFF1A"><a href="#4-__u8FD0_u884C_u73AF_u5883_u90E8_u7F72_uFF1A" class="headerlink" title="4. 运行环境部署："></a>4. 运行环境部署：</h3><p>这里以Ubuntu Server 14.04为例</p>
+<p>1、首先使用浏览器登录你自己的Github账号，将github.com/FateSolo下的FiveChessServer项目Fork到你自己的账号下(如果可以从其他地方获取到源文件，例如大创光盘，那么请直接从第8步开始)</p>
+<p>2、在Ubuntu的终端下安装git</p>
+<pre><code>$ sudo apt-get install git
+</code></pre><p>3、配置你的git</p>
+<pre><code>$ git config --global user.name &quot;在这里填写你的用户名&quot;
+$ git config --global user.email &quot;在这里填写你的邮箱&quot;
+</code></pre><p>4、在Ubuntu的终端下安装ssh</p>
+<pre><code>$ sudo apt-get install ssh
+</code></pre><p>5、生成密钥</p>
+<pre><code>$ ssh-keygen -t rsa -C &quot;你的邮箱&quot;
+</code></pre><p>6、找到当前路径下的隐藏文件.ssh，复制id_rsa.pub文件中的内容，到Github网页上进入Settings，找到SSH Keys将复制的密钥加入</p>
+<p>7、成功后可以从你的Github中克隆项目到本地了(注意将name替换成你的用户名)</p>
+<pre><code>$ git clone git@github.com:name/FiveChessServer.git
+</code></pre><p>8、安装setuptools</p>
+<pre><code>$ wget &quot;https://pypi.python.org/packages/source/s/setuptools/setuptools-12.0.3.tar.gz#md5=f07e4b0f4c1c9368fcd980d888b29a65&quot; --no-check-certificate
+$ tar -zxvf setuptools-12.0.3.tar.gz
+$ cd setuptools-12.0.3
+$ sudo python setup.py install
+</code></pre><p>9、安装pip</p>
+<pre><code>$ wget &quot;https://pypi.python.org/packages/source/p/pip/pip-1.5.4.tar.gz#md5=834b2904f92d46aaa333267fb1c922bb&quot; --no-check-certificate
+$ tar -xzvf pip-1.5.4.tar.gz
+$ cd pip-1.5.4
+$ sudo python setup.py install
+</code></pre><p>10、安装MySQL</p>
+<pre><code>$ sudo apt-get install mysql-client mysql-server
+</code></pre><p>11、建数据库、表</p>
+<pre><code>$ mysql -u root -p
+mysql&gt; CREATE SCHEMA `FiveChess` DEFAULT CHARACTER SET utf8 ;
+mysql&gt; CREATE TABLE `FiveChess`.`User` (`UserName` VARCHAR(10) NOT NULL,`PassWord` VARCHAR(10) NOT NULL,`NickName` VARCHAR(20) NOT NULL,`Win` INT NULL DEFAULT 0,`Lose` INT NULL DEFAULT 0,`Draw` INT NULL DEFAULT 0,PRIMARY KEY (`UserName`));
+</code></pre><p>12、安装环境依赖</p>
+<pre><code>$ sudo apt-get update
+$ sudo apt-get install gcc libmysqlclient-dev python-dev
+</code></pre><p>13、安装MySQLdb模块</p>
+<pre><code>$ sudo pip install MySQL-Python
+</code></pre><p>14、安装Twisted</p>
+<pre><code>$ sudo pip install twisted
+</code></pre><p>15、以守护进程方式运行FiveChessServer.py</p>
+<pre><code>$ cd FiveChessServer
+$ sudo twistd -y FiveChessServer.py
+</code></pre><p>16、验证是否成功运行(查看是否拥有名为twistd的进程)</p>
+<pre><code>$ ps -e
+</code></pre><hr>
+<p>作者 [@FateSolo]<br>2016 年 2月 6日</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/02/06/Five-Chess-Server/" data-id="cj3vw71480015gvla61aq47gv" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-My-Gradle-Test" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2015/12/28/My-Gradle-Test/" class="article-date">
@@ -136,7 +330,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/12/28/My-Gradle-Test/" data-id="cj3vkyg1f000fv6larw3w7igy" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2015/12/28/My-Gradle-Test/" data-id="cj3vw713k000fgvlaoqrjgsx4" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li></ul>
@@ -183,7 +377,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/12/28/hello-world/" data-id="cj3vkyg120007v6labiz45obu" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2015/12/28/hello-world/" data-id="cj3vw71390007gvlalq2566h2" class="article-share-link">Share</a>
       
       
     </footer>
@@ -216,7 +410,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hibernate/">Hibernate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JPA/">JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jdbc/">Jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JdbcTemplate/">JdbcTemplate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logback/">Logback</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZooKeeper/">ZooKeeper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hibernate/">Hibernate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JPA/">JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jdbc/">Jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JdbcTemplate/">JdbcTemplate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logback/">Logback</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZooKeeper/">ZooKeeper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
     </div>
   </div>
 
@@ -226,7 +420,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Dubbo/" style="font-size: 20px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 16px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 14px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 14px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 18px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 16px;">SpringMVC</a> <a href="/tags/ZooKeeper/" style="font-size: 12px;">ZooKeeper</a> <a href="/tags/五子棋/" style="font-size: 12px;">五子棋</a>
+      <a href="/tags/Dubbo/" style="font-size: 20px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 16px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 14px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 14px;">Mybatis</a> <a href="/tags/Nginx/" style="font-size: 10px;">Nginx</a> <a href="/tags/Spring/" style="font-size: 18px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 16px;">SpringMVC</a> <a href="/tags/ZooKeeper/" style="font-size: 12px;">ZooKeeper</a> <a href="/tags/五子棋/" style="font-size: 12px;">五子棋</a>
     </div>
   </div>
 
@@ -248,6 +442,14 @@
       <ul>
         
           <li>
+            <a href="/2017/06/14/Dubbo-Test-8-Redis/">Dubbo-Test-8-Redis</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/05/Dubbo-Test-7-Cluster3/">Dubbo学习笔记 七：Nginx + Tomcat集群</a>
+          </li>
+        
+          <li>
             <a href="/2017/06/04/Dubbo-Test-6-Cluster2/">Dubbo学习笔记 六：ZooKeeper集群</a>
           </li>
         
@@ -257,14 +459,6 @@
         
           <li>
             <a href="/2017/06/02/Dubbo-Test-4-RESTful/">Dubbo学习笔记 四：支持RESTful Remoting</a>
-          </li>
-        
-          <li>
-            <a href="/2017/05/31/Dubbo-Test-3-Spring/">Dubbo学习笔记 三：搭建Spring + Dubbo框架</a>
-          </li>
-        
-          <li>
-            <a href="/2017/05/25/Dubbo-Test-2-Gradle/">Dubbo学习笔记 二：使用Gradle构建多module项目</a>
           </li>
         
       </ul>

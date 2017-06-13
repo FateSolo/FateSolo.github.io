@@ -66,6 +66,153 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-JSH-Test-2-Spring" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/03/22/JSH-Test-2-Spring/" class="article-date">
+  <time datetime="2017-03-22T05:43:06.000Z" itemprop="datePublished">2017-03-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/JAX-RS系列/">JAX-RS系列</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/03/22/JSH-Test-2-Spring/">JAX-RS初探 二：整合Spring + Spring-Data-JPA</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<p>项目地址：<br><a href="https://github.com/FateSolo/JSH-Test" target="_blank" rel="external">https://github.com/FateSolo/JSH-Test</a></p>
+<h3 id="u76EE_u5F55_uFF1A"><a href="#u76EE_u5F55_uFF1A" class="headerlink" title="目录："></a>目录：</h3><ul>
+<li><a href="/2017/03/22/JSH-Test-1-Jersey/">1. 搭建Jerysey框架</a></li>
+<li><a href="/2017/03/22/JSH-Test-2-Spring/">2. 整合Spring+Spring-Data-JPA</a></li>
+<li><a href="/2017/03/22/JSH-Test-3-Other/">3. 其他</a></li>
+</ul>
+<p>通过上章示例可知，JAX-RS标准应属于三层架构中的表现层，与之对应的是Struts2、SpringMVC这些表现层框架。</p>
+<p>因此，Jersey同样可以与Spring整合，享受Spring带来的全方位的便利，本章将示范整合Jersey + Spring + Spring-Data-JPA (Hibernate实现)。</p>
+<h3 id="1-__u6574_u5408Spring"><a href="#1-__u6574_u5408Spring" class="headerlink" title="1. 整合Spring"></a>1. 整合Spring</h3><p>1) 打开web.xml，添加如下配置：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- Spring --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">context-param</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="title">param-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">param-value</span>&gt;</span>classpath:config/spring/spring-common.xml<span class="tag">&lt;/<span class="title">param-value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">context-param</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">listener</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">listener-class</span>&gt;</span>org.springframework.web.context.ContextLoaderListener<span class="tag">&lt;/<span class="title">listener-class</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">listener</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>2) 添加Spring依赖：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/**&#10; * Jersey&#10; */&#10;compile &#39;org.glassfish.jersey.ext:jersey-spring3:2.25.1&#39;&#10;&#10;/**&#10; * Spring&#10; */&#10;compile &#39;org.springframework:spring-web:4.3.7.RELEASE&#39;</span><br></pre></td></tr></table></figure></p>
+<p>其中jersey-spring3是Jersey整合Spring所必需的依赖，其本身依赖jersey-container-servlet-core，因此可替换掉jersey-container-servlet-core。</p>
+<p>3) 在resources/config/spring目录下创建Spring配置文件spring-common.xml：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="pi">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">beans</span> <span class="attribute">xmlns</span>=<span class="value">"http://www.springframework.org/schema/beans"</span></span><br><span class="line">       <span class="attribute">xmlns:xsi</span>=<span class="value">"http://www.w3.org/2001/XMLSchema-instance"</span></span><br><span class="line">       <span class="attribute">xmlns:context</span>=<span class="value">"http://www.springframework.org/schema/context"</span></span><br><span class="line">       <span class="attribute">xmlns:tx</span>=<span class="value">"http://www.springframework.org/schema/tx"</span></span><br><span class="line">       <span class="attribute">xmlns:jpa</span>=<span class="value">"http://www.springframework.org/schema/data/jpa"</span></span><br><span class="line">       <span class="attribute">xsi:schemaLocation</span>=<span class="value">"http://www.springframework.org/schema/beans</span><br><span class="line">       http://www.springframework.org/schema/beans/spring-beans.xsd</span><br><span class="line">       http://www.springframework.org/schema/context</span><br><span class="line">       http://www.springframework.org/schema/context/spring-context.xsd</span><br><span class="line">       http://www.springframework.org/schema/tx</span><br><span class="line">       http://www.springframework.org/schema/tx/spring-tx.xsd</span><br><span class="line">       http://www.springframework.org/schema/data/jpa</span><br><span class="line">       http://www.springframework.org/schema/data/jpa/spring-jpa.xsd"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">description</span>&gt;</span>Spring 配置<span class="tag">&lt;/<span class="title">description</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 扫描包内所有注解 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">context:component-scan</span> <span class="attribute">base-package</span>=<span class="value">"com.fatesolo.jsh"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="title">beans</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="2-__u6574_u5408Spring-Data-JPA"><a href="#2-__u6574_u5408Spring-Data-JPA" class="headerlink" title="2. 整合Spring-Data-JPA"></a>2. 整合Spring-Data-JPA</h3><p>1) 添加MySQL、Druid、Hibernate、Spring-Data-JPA依赖：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/**&#10; * Druid&#10; */&#10;compile &#39;com.alibaba:druid:1.0.28&#39;&#10;&#10;/**&#10; * Mysql&#10; */&#10;compile &#39;mysql:mysql-connector-java:6.0.5&#39;&#10;&#10;/**&#10; * Hibernate&#10; */&#10;compile &#39;org.hibernate:hibernate-core:5.2.7.Final&#39;&#10;&#10;/**&#10; * Spring&#10; */&#10;compile &#39;org.springframework:spring-orm:4.3.7.RELEASE&#39;&#10;compile &#39;org.springframework:spring-web:4.3.7.RELEASE&#39;&#10;compile &#39;org.springframework.data:spring-data-jpa:1.11.1.RELEASE&#39;</span><br></pre></td></tr></table></figure></p>
+<p>其中spring-orm在配置JPA时要用到。</p>
+<p>2) 在resources/config/db目录下创建db.properties，配置相关信息：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc.url=jdbc:mysql://localhost:3306/jsh_test?useUnicode=true&#38;characterEncoding=utf8&#10;jdbc.username=root&#10;jdbc.password=123456&#10;&#10;druid.initialSize=5&#10;druid.minIdle=5&#10;druid.maxActive=50&#10;&#10;hibernate.dialect=org.hibernate.dialect.MySQL5Dialect&#10;hibernate.show_sql=true&#10;hibernate.format_sql=true&#10;hibernate.hbm2ddl.auto=update</span><br></pre></td></tr></table></figure></p>
+<p>3) 在spring-common.xml中配置数据源、JPA、Spring-Data-JPA：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 引入 db.properties 配置文件 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">context:property-placeholder</span> <span class="attribute">location</span>=<span class="value">"classpath:config/db/db.properties"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- Druid 数据源 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"dataSource"</span> <span class="attribute">class</span>=<span class="value">"com.alibaba.druid.pool.DruidDataSource"</span> <span class="attribute">init-method</span>=<span class="value">"init"</span> <span class="attribute">destroy-method</span>=<span class="value">"close"</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 基本属性 url、user、password --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"url"</span> <span class="attribute">value</span>=<span class="value">"$&#123;jdbc.url&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"username"</span> <span class="attribute">value</span>=<span class="value">"$&#123;jdbc.username&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"password"</span> <span class="attribute">value</span>=<span class="value">"$&#123;jdbc.password&#125;"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 配置初始化大小、最小、最大 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"initialSize"</span> <span class="attribute">value</span>=<span class="value">"$&#123;druid.initialSize&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"minIdle"</span> <span class="attribute">value</span>=<span class="value">"$&#123;druid.minIdle&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"maxActive"</span> <span class="attribute">value</span>=<span class="value">"$&#123;druid.maxActive&#125;"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 配置获取连接等待超时的时间 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"maxWait"</span> <span class="attribute">value</span>=<span class="value">"60000"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"timeBetweenEvictionRunsMillis"</span> <span class="attribute">value</span>=<span class="value">"60000"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 配置一个连接在池中最小生存的时间，单位是毫秒 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"minEvictableIdleTimeMillis"</span> <span class="attribute">value</span>=<span class="value">"300000"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"validationQuery"</span> <span class="attribute">value</span>=<span class="value">"SELECT 'x'"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"testWhileIdle"</span> <span class="attribute">value</span>=<span class="value">"true"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"testOnBorrow"</span> <span class="attribute">value</span>=<span class="value">"false"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"testOnReturn"</span> <span class="attribute">value</span>=<span class="value">"false"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"poolPreparedStatements"</span> <span class="attribute">value</span>=<span class="value">"false"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- JPA --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"entityManagerFactory"</span> <span class="attribute">class</span>=<span class="value">"org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"dataSource"</span> <span class="attribute">ref</span>=<span class="value">"dataSource"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"packagesToScan"</span> <span class="attribute">value</span>=<span class="value">"com.fatesolo.jsh.entity"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"jpaVendorAdapter"</span> <span class="attribute">ref</span>=<span class="value">"jpaVendorAdapter"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"jpaProperties"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">props</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">prop</span> <span class="attribute">key</span>=<span class="value">"hibernate.dialect"</span>&gt;</span>$&#123;hibernate.dialect&#125;<span class="tag">&lt;/<span class="title">prop</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">prop</span> <span class="attribute">key</span>=<span class="value">"hibernate.show_sql"</span>&gt;</span>$&#123;hibernate.show_sql&#125;<span class="tag">&lt;/<span class="title">prop</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">prop</span> <span class="attribute">key</span>=<span class="value">"hibernate.format_sql"</span>&gt;</span>$&#123;hibernate.format_sql&#125;<span class="tag">&lt;/<span class="title">prop</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">prop</span> <span class="attribute">key</span>=<span class="value">"hibernate.hbm2ddl.auto"</span>&gt;</span>$&#123;hibernate.hbm2ddl.auto&#125;<span class="tag">&lt;/<span class="title">prop</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="title">props</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"jpaVendorAdapter"</span> <span class="attribute">class</span>=<span class="value">"org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"generateDdl"</span> <span class="attribute">value</span>=<span class="value">"false"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"database"</span> <span class="attribute">value</span>=<span class="value">"MYSQL"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"databasePlatform"</span> <span class="attribute">value</span>=<span class="value">"org.hibernate.dialect.MySQL5InnoDBDialect"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 配置 JPA 事务 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"transactionManager"</span> <span class="attribute">class</span>=<span class="value">"org.springframework.orm.jpa.JpaTransactionManager"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"entityManagerFactory"</span> <span class="attribute">ref</span>=<span class="value">"entityManagerFactory"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">tx:annotation-driven</span> <span class="attribute">transaction-manager</span>=<span class="value">"transactionManager"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- Spring Data JPA --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">jpa:repositories</span> <span class="attribute">base-package</span>=<span class="value">"com.fatesolo.jsh.repository"</span></span><br><span class="line">                  <span class="attribute">transaction-manager-ref</span>=<span class="value">"transactionManager"</span></span><br><span class="line">                  <span class="attribute">entity-manager-factory-ref</span>=<span class="value">"entityManagerFactory"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="3-__u7F16_u5199_u57FA_u7840_u4EE3_u7801"><a href="#3-__u7F16_u5199_u57FA_u7840_u4EE3_u7801" class="headerlink" title="3. 编写基础代码"></a>3. 编写基础代码</h3><p>1) 改造实体Book，在类名上增加相关注解<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@Entity</span></span><br><span class="line"><span class="annotation">@Table</span>(name = <span class="string">"book"</span>)</span><br><span class="line"><span class="annotation">@XmlRootElement</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span> </span>&#123;</span><br></pre></td></tr></table></figure></p>
+<p>在字段上增加相关注解<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@Id</span></span><br><span class="line"><span class="annotation">@GeneratedValue</span>(strategy = GenerationType.IDENTITY)</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@Column</span>(nullable = <span class="keyword">false</span>)</span><br><span class="line"><span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@Column</span>(nullable = <span class="keyword">false</span>)</span><br><span class="line"><span class="keyword">private</span> String author;</span><br></pre></td></tr></table></figure></p>
+<p>2) 建立repository子包，并创建BookRepository类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.jsh.repository;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.fatesolo.jsh.entity.Book;</span><br><span class="line"><span class="keyword">import</span> org.springframework.data.repository.RepositoryDefinition;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@RepositoryDefinition</span>(domainClass = Book.class, idClass = Integer.class)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BookRepository</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function">Book <span class="title">findById</span><span class="params">(<span class="keyword">int</span> id)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">List&lt;Book&gt; <span class="title">findAll</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">save</span><span class="params">(Book book)</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3) 建立service子包，并创建BookService类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.jsh.service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.fatesolo.jsh.repository.BookRepository;</span><br><span class="line"><span class="keyword">import</span> com.fatesolo.jsh.entity.Book;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"><span class="keyword">import</span> org.springframework.transaction.annotation.Transactional;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.annotation.Resource;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@Service</span></span><br><span class="line"><span class="annotation">@Transactional</span>(rollbackFor = Exception.class)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BookService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> BookRepository repository;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Book <span class="title">getBookById</span><span class="params">(<span class="keyword">int</span> id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> repository.findById(id);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Book&gt; <span class="title">getBooks</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> repository.findAll();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">addBook</span><span class="params">(Book book)</span> </span>&#123;</span><br><span class="line">        repository.save(book);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> book.getId() != <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4) 改造资源BookResource，增加@Controller注解(事实上也可以使用@Component，在不使用SpringMVC的情况下，增加@Controller仅仅是为了将该类声明为由Spring容器管理的一个bean，以支持注入Service层)，并访问service层方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.jsh.resource;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.fatesolo.jsh.entity.Book;</span><br><span class="line"><span class="keyword">import</span> com.fatesolo.jsh.entity.Result;</span><br><span class="line"><span class="keyword">import</span> com.fatesolo.jsh.service.BookService;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Controller;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.annotation.Resource;</span><br><span class="line"><span class="keyword">import</span> javax.ws.rs.*;</span><br><span class="line"><span class="keyword">import</span> javax.ws.rs.core.MediaType;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@Controller</span></span><br><span class="line"><span class="annotation">@Path</span>(<span class="string">"/book"</span>)</span><br><span class="line"><span class="annotation">@Consumes</span>(MediaType.APPLICATION_XML)</span><br><span class="line"><span class="annotation">@Produces</span>(MediaType.APPLICATION_XML)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BookResource</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> BookService service;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@GET</span></span><br><span class="line">    <span class="annotation">@Path</span>(<span class="string">"/&#123;id&#125;"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Book <span class="title">getBookById</span><span class="params">(@PathParam(<span class="string">"id"</span>)</span> <span class="keyword">int</span> id) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> service.getBookById(id);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@GET</span></span><br><span class="line">    <span class="annotation">@Path</span>(<span class="string">"/"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Book&gt; <span class="title">getBooks</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> service.getBooks();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@POST</span></span><br><span class="line">    <span class="annotation">@Path</span>(<span class="string">"/"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Result <span class="title">addBook</span><span class="params">(Book book)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> service.addBook(book) ? Result.success() : Result.failure();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="4-__u9879_u76EE_u8FD0_u884C_uFF1A"><a href="#4-__u9879_u76EE_u8FD0_u884C_uFF1A" class="headerlink" title="4. 项目运行："></a>4. 项目运行：</h3><p>1) 使用Tomcat 8运行项目，使用curl工具添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -H &#34;Content-Type:application/xml&#34; -d &#34;&#60;book&#62;&#60;name&#62;Book&#60;/name&#62;&#60;author&#62;Fate&#60;/author&#62;&#60;/book&#62;&#34; http://localhost:8080/rest/book</span><br></pre></td></tr></table></figure></p>
+<p>得到如下返回：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">result</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">code</span>&gt;</span>SUCCESS<span class="tag">&lt;/<span class="title">code</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">result</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>2) 访问<a href="http://localhost:8080/rest/book/1" target="_blank" rel="external">http://localhost:8080/rest/book/1</a> ，得到如下结果：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">book</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">author</span>&gt;</span>Fate<span class="tag">&lt;/<span class="title">author</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">id</span>&gt;</span>1<span class="tag">&lt;/<span class="title">id</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">name</span>&gt;</span>Book<span class="tag">&lt;/<span class="title">name</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">book</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>3) 访问<a href="http://localhost:8080/rest/book" target="_blank" rel="external">http://localhost:8080/rest/book</a> ，得到如下结果：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">books</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">book</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">author</span>&gt;</span>Fate<span class="tag">&lt;/<span class="title">author</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">id</span>&gt;</span>1<span class="tag">&lt;/<span class="title">id</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">name</span>&gt;</span>Book<span class="tag">&lt;/<span class="title">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">book</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">books</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>至此，Jersey + Spring + Spring-Data-JPA整合完成。</p>
+<hr>
+<p>作者 [@FateSolo]<br>2017 年 03月 22日</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-2-Spring/" data-id="cj3vw713x000ugvlay3itbfmo" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-JSH-Test-1-Jersey" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/03/22/JSH-Test-1-Jersey/" class="article-date">
+  <time datetime="2017-03-22T03:05:45.000Z" itemprop="datePublished">2017-03-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/JAX-RS系列/">JAX-RS系列</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/03/22/JSH-Test-1-Jersey/">JAX-RS初探 一：搭建Jersey框架</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<p>项目地址：<br><a href="https://github.com/FateSolo/JSH-Test" target="_blank" rel="external">https://github.com/FateSolo/JSH-Test</a></p>
+<h3 id="u76EE_u5F55_uFF1A"><a href="#u76EE_u5F55_uFF1A" class="headerlink" title="目录："></a>目录：</h3><ul>
+<li><a href="/2017/03/22/JSH-Test-1-Jersey/">1. 搭建Jerysey框架</a></li>
+<li><a href="/2017/03/22/JSH-Test-2-Spring/">2. 整合Spring+Spring-Data-JPA</a></li>
+<li><a href="/2017/03/22/JSH-Test-3-Other/">3. 其他</a></li>
+</ul>
+<p>JAX-RS(JSR-311 &amp; JSR-339标准)，全称Java API for RESTful Web Services，旨在定义一个统一的规范，使得Java程序员可以使用一套固定的接口来开发RESTful应用，避免了依赖于第三方框架。</p>
+<p>RESTful，全称Representational State Transfer，是一种网络服务设计风格，将所有的URI都视为资源，在URI中只包含名词而没有动词，以HTTP的四种方法来对资源进行操作。</p>
+<p>JAX-RS与JPA类似，都是标准却没有实现，需要第三方来提供具体实现，而Jersey框架就是Sun公司推出的JSR-311的参考实现，本章将使用Jersey框架搭建一个RESTful服务。</p>
+<h3 id="u9879_u76EE_u73AF_u5883_uFF1A"><a href="#u9879_u76EE_u73AF_u5883_uFF1A" class="headerlink" title="项目环境："></a>项目环境：</h3><ul>
+<li>Ubuntu 14.04.3</li>
+<li>Intellij IDEA 15.0.2</li>
+</ul>
+<h3 id="1-__u9879_u76EE_u642D_u5EFA_uFF1A"><a href="#1-__u9879_u76EE_u642D_u5EFA_uFF1A" class="headerlink" title="1. 项目搭建："></a>1. 项目搭建：</h3><p>1) 打开IDEA，点击Create New Project，在左侧边栏找到Gradle，并勾选Java和Web，JDK选择1.8。</p>
+<p>2) 点击Next，GroupId：com.fatesolo；ArtifactId：JSH-Test。</p>
+<p>3) 点击Next，勾选Use auto-import和Create directories for…。</p>
+<p>4) 点击Next，直接Finish即完成了项目的创建。</p>
+<h3 id="2-__u914D_u7F6E_u4F9D_u8D56"><a href="#2-__u914D_u7F6E_u4F9D_u8D56" class="headerlink" title="2. 配置依赖"></a>2. 配置依赖</h3><p>1) 打开build.gradle文件, 在dependencies中，加入Jersey相关依赖：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/**&#10; * Jersey&#10; */&#10;compile &#39;org.glassfish.jersey.containers:jersey-container-servlet-core:2.25.1&#39;</span><br></pre></td></tr></table></figure></p>
+<h3 id="3-__u7F16_u5199web-xml"><a href="#3-__u7F16_u5199web-xml" class="headerlink" title="3. 编写web.xml"></a>3. 编写web.xml</h3><p>1) 打开web.xml，编写如下配置：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="pi">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">web-app</span> <span class="attribute">xmlns</span>=<span class="value">"http://java.sun.com/xml/ns/javaee"</span></span><br><span class="line">         <span class="attribute">xmlns:xsi</span>=<span class="value">"http://www.w3.org/2001/XMLSchema-instance"</span></span><br><span class="line">         <span class="attribute">xsi:schemaLocation</span>=<span class="value">"http://java.sun.com/xml/ns/javaee</span><br><span class="line">    	  http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"</span></span><br><span class="line">         <span class="attribute">version</span>=<span class="value">"3.0"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">display-name</span>&gt;</span>JSH-Test<span class="tag">&lt;/<span class="title">display-name</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">context-param</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">param-name</span>&gt;</span>webAppRootKey<span class="tag">&lt;/<span class="title">param-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">param-value</span>&gt;</span>JSH-Test.root<span class="tag">&lt;/<span class="title">param-value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">context-param</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- Jersey --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">servlet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">servlet-name</span>&gt;</span>Jersey<span class="tag">&lt;/<span class="title">servlet-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">servlet-class</span>&gt;</span>org.glassfish.jersey.servlet.ServletContainer<span class="tag">&lt;/<span class="title">servlet-class</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="title">init-param</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">param-name</span>&gt;</span>javax.ws.rs.Application<span class="tag">&lt;/<span class="title">param-name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">param-value</span>&gt;</span>com.fatesolo.jsh.application.Application<span class="tag">&lt;/<span class="title">param-value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="title">init-param</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="title">load-on-startup</span>&gt;</span>1<span class="tag">&lt;/<span class="title">load-on-startup</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">servlet</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">servlet-mapping</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">servlet-name</span>&gt;</span>Jersey<span class="tag">&lt;/<span class="title">servlet-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">url-pattern</span>&gt;</span>/rest/*<span class="tag">&lt;/<span class="title">url-pattern</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">servlet-mapping</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="title">web-app</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="4-__u7F16_u5199_u57FA_u7840_u4EE3_u7801"><a href="#4-__u7F16_u5199_u57FA_u7840_u4EE3_u7801" class="headerlink" title="4. 编写基础代码"></a>4. 编写基础代码</h3><p>1) 在com.fatesolo.jsh下建立application子包，并创建Application类，继承ResourceConfig，用来注册Jersey下的各种资源：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.jsh.application;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.glassfish.jersey.server.ResourceConfig;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Application</span> <span class="keyword">extends</span> <span class="title">ResourceConfig</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Application</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2) 建立entity子包，存放实体，这里以书籍Book为例，编写Book的实体代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.jsh.entity;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String author;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">(<span class="keyword">int</span> id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.id = id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getAuthor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> author;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAuthor</span><span class="params">(String author)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.author = author;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3) 再创建Result类，作为请求的响应实体：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.jsh.entity;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Result</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String code;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String msg;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> code;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setCode</span><span class="params">(String code)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.code = code;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getMsg</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> msg;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setMsg</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.msg = msg;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Result <span class="title">success</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        Result result = <span class="keyword">new</span> Result();</span><br><span class="line"></span><br><span class="line">        result.setCode(<span class="string">"SUCCESS"</span>);</span><br><span class="line">        result.setMsg(msg);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Result <span class="title">success</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> success(<span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Result <span class="title">failure</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        Result result = <span class="keyword">new</span> Result();</span><br><span class="line"></span><br><span class="line">        result.setCode(<span class="string">"FAILURE"</span>);</span><br><span class="line">        result.setMsg(msg);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Result <span class="title">failure</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> failure(<span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4) 建立resource子包，并创建BookResource类，编写如下代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.jsh.resource;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.fatesolo.jsh.entity.Book;</span><br><span class="line"><span class="keyword">import</span> com.fatesolo.jsh.entity.Result;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.ws.rs.*;</span><br><span class="line"><span class="keyword">import</span> javax.ws.rs.core.MediaType;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@Path</span>(<span class="string">"/book"</span>)</span><br><span class="line"><span class="annotation">@Consumes</span>(MediaType.APPLICATION_XML)</span><br><span class="line"><span class="annotation">@Produces</span>(MediaType.APPLICATION_XML)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BookResource</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@GET</span></span><br><span class="line">    <span class="annotation">@Path</span>(<span class="string">"/&#123;id&#125;"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Book <span class="title">getBookById</span><span class="params">(@PathParam(<span class="string">"id"</span>)</span> <span class="keyword">int</span> id) </span>&#123;</span><br><span class="line">        Book book = <span class="keyword">new</span> Book();</span><br><span class="line">        book.setId(id);</span><br><span class="line">        book.setName(<span class="string">"Book "</span> + id);</span><br><span class="line">        book.setAuthor(<span class="string">"Author "</span> + id);</span><br><span class="line">        <span class="keyword">return</span> book;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@GET</span></span><br><span class="line">    <span class="annotation">@Path</span>(<span class="string">"/"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Book&gt; <span class="title">getBooks</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        List&lt;Book&gt; books = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        books.add(getBookById(<span class="number">1</span>));</span><br><span class="line">        books.add(getBookById(<span class="number">2</span>));</span><br><span class="line">        books.add(getBookById(<span class="number">3</span>));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> books;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@POST</span></span><br><span class="line">    <span class="annotation">@Path</span>(<span class="string">"/"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Result <span class="title">addBook</span><span class="params">(Book book)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Result.success(book.getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里只是简单new了一个实体作为返回，方便测试。</p>
+<p>5) 资源类若想被访问到，需要在Application类中注册，在Application的默认构造函数中增加如下代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">register(BookResource.class);</span><br></pre></td></tr></table></figure></p>
+<p>6) 在BookResource中，@Consumes和@Produces分别限定了Content-Type和Accept的类型，这里限定只接受和返回xml类型数据，所以要在User和Result两个实体类上加xml注解：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@XmlRootElement</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="5-__u9879_u76EE_u8FD0_u884C_uFF1A"><a href="#5-__u9879_u76EE_u8FD0_u884C_uFF1A" class="headerlink" title="5. 项目运行："></a>5. 项目运行：</h3><p>1) 使用Tomcat 8运行项目，使用curl工具添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -H &#34;Content-Type:application/xml&#34; -d &#34;&#60;book&#62;&#60;name&#62;Book&#60;/name&#62;&#60;author&#62;Fate&#60;/author&#62;&#60;/book&#62;&#34; http://localhost:8080/rest/book</span><br></pre></td></tr></table></figure></p>
+<p>得到如下返回：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">result</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">code</span>&gt;</span>SUCCESS<span class="tag">&lt;/<span class="title">code</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">msg</span>&gt;</span>Book<span class="tag">&lt;/<span class="title">msg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">result</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>2) 访问<a href="http://localhost:8080/rest/book/1" target="_blank" rel="external">http://localhost:8080/rest/book/1</a> ，得到如下结果：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">book</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">author</span>&gt;</span>Author 1<span class="tag">&lt;/<span class="title">author</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">id</span>&gt;</span>1<span class="tag">&lt;/<span class="title">id</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">name</span>&gt;</span>Book 1<span class="tag">&lt;/<span class="title">name</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">book</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>3) 访问<a href="http://localhost:8080/rest/book" target="_blank" rel="external">http://localhost:8080/rest/book</a> ，得到如下结果：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">books</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">book</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">author</span>&gt;</span>Author 1<span class="tag">&lt;/<span class="title">author</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">id</span>&gt;</span>1<span class="tag">&lt;/<span class="title">id</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">name</span>&gt;</span>Book 1<span class="tag">&lt;/<span class="title">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">book</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">book</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">author</span>&gt;</span>Author 2<span class="tag">&lt;/<span class="title">author</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">id</span>&gt;</span>2<span class="tag">&lt;/<span class="title">id</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">name</span>&gt;</span>Book 2<span class="tag">&lt;/<span class="title">name</span>&gt;</span>    </span><br><span class="line">    <span class="tag">&lt;/<span class="title">book</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">book</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">author</span>&gt;</span>Author 3<span class="tag">&lt;/<span class="title">author</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">id</span>&gt;</span>3<span class="tag">&lt;/<span class="title">id</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">name</span>&gt;</span>Book 3<span class="tag">&lt;/<span class="title">name</span>&gt;</span>        </span><br><span class="line">    <span class="tag">&lt;/<span class="title">book</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">books</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>至此，Jersey框架搭建完毕。</p>
+<hr>
+<p>作者 [@FateSolo]<br>2017 年 03月 22日</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-1-Jersey/" data-id="cj3vw71430011gvlar15mjfu3" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jersey/">Jersey</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-DAO-Test-6-SpringDataJPA" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/03/12/DAO-Test-6-SpringDataJPA/" class="article-date">
@@ -123,7 +270,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-6-SpringDataJPA/" data-id="cj3vkyg3b0029v6lacvhp59fj" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-6-SpringDataJPA/" data-id="cj3vw715q002fgvla75vqpf0g" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li></ul>
@@ -189,7 +336,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-5-JPA/" data-id="cj3vkyg3f002cv6laaytnrkwz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-5-JPA/" data-id="cj3vw715t002igvlauwyspo3t" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JPA/">JPA</a></li></ul>
@@ -256,7 +403,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-4-Hibernate/" data-id="cj3vkyg3i002gv6la2ugc9dqz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-4-Hibernate/" data-id="cj3vw715y002mgvla5cke07jc" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hibernate/">Hibernate</a></li></ul>
@@ -323,7 +470,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-3-Mybatis/" data-id="cj3vkyg3m002kv6laf4zry15y" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-3-Mybatis/" data-id="cj3vw7163002qgvla5xkg7nr6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Mybatis/">Mybatis</a></li></ul>
@@ -388,7 +535,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-2-JdbcTemplate/" data-id="cj3vkyg3r002nv6la4s95iyrr" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-2-JdbcTemplate/" data-id="cj3vw7167002tgvlayyxwm4sl" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JdbcTemplate/">JdbcTemplate</a></li></ul>
@@ -453,7 +600,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-1-Jdbc/" data-id="cj3vkyg3w002rv6laya82llu9" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-1-Jdbc/" data-id="cj3vw716b002xgvlau86u1am6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jdbc/">Jdbc</a></li></ul>
@@ -530,7 +677,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-0-Intro/" data-id="cj3vkyg030000v6lam4yo76km" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-0-Intro/" data-id="cj3vw71250000gvlabugl2dpq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li></ul>
@@ -653,204 +800,10 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/02/18/SSM-Test/" data-id="cj3vkyg170008v6lal3sp9v0g" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/02/18/SSM-Test/" data-id="cj3vw713e0008gvla7xyd82fy" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Five-Chess-Client" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/02/06/Five-Chess-Client/" class="article-date">
-  <time datetime="2016-02-06T06:25:48.000Z" itemprop="datePublished">2016-02-06</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/五子棋/">五子棋</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/02/06/Five-Chess-Client/">网络智能五子棋博弈系统的客户端说明</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <hr>
-<p>大学生创新项目：网络智能五子棋博弈系统的研究与实现</p>
-<p>项目说明：实现了C/S架构的五子棋游戏，支持双人对弈、人机对弈等功能</p>
-<p>服务器端代码开源：<a href="https://github.com/FateSolo/FiveChessServer" target="_blank" rel="external">https://github.com/FateSolo/FiveChessServer</a></p>
-<p>客户端代码开源：<a href="https://github.com/FateSolo/FiveChessClient" target="_blank" rel="external">https://github.com/FateSolo/FiveChessClient</a></p>
-<p>本篇文章是对客户端程序的简要说明。</p>
-<h3 id="1-__u9879_u76EE_u5F00_u53D1_u73AF_u5883_uFF1A"><a href="#1-__u9879_u76EE_u5F00_u53D1_u73AF_u5883_uFF1A" class="headerlink" title="1. 项目开发环境："></a>1. 项目开发环境：</h3><ul>
-<li>Windows 8.1</li>
-<li>Visual Studio 2013</li>
-<li>Qt Creator 3.3.0</li>
-</ul>
-<h3 id="2-__u603B_u4F53_u8BF4_u660E_uFF1A"><a href="#2-__u603B_u4F53_u8BF4_u660E_uFF1A" class="headerlink" title="2. 总体说明："></a>2. 总体说明：</h3><ul>
-<li><p>主要使用C++实现客户端逻辑功能</p>
-</li>
-<li><p>应用了Qt框架完成对图形界面、网络功能的编写</p>
-</li>
-</ul>
-<h3 id="3-__u8FD0_u884C_u73AF_u5883_u90E8_u7F72_uFF1A"><a href="#3-__u8FD0_u884C_u73AF_u5883_u90E8_u7F72_uFF1A" class="headerlink" title="3. 运行环境部署："></a>3. 运行环境部署：</h3><p>这里以Windows 8.1为例</p>
-<p>1、请确保系统中已经安装了Visual Studio或者MinGW</p>
-<p>2、前往<a href="http://www.qt.io/download-open-source/#section-2下载对应的Qt" target="_blank" rel="external">http://www.qt.io/download-open-source/#section-2下载对应的Qt</a></p>
-<p>3、安装Github客户端（如果可以从其他地方获取到源文件，例如大创光盘，那么请忽略第3、4步）</p>
-<p>4、使用Github客户端克隆FiveChessClient(请先将github.com/FateSolo下的FiveChessClient项目Fork到你自己的账号)，<br>或者使用Git Bash克隆(注意将name替换成你的用户名)</p>
-<pre><code>$ git clone git@github.com:name/FiveChessClient.git
-</code></pre><p>5、打开Qt Creator，导入FiveChessClient，运行</p>
-<p>6、在FiveChessClient的父目录中找到构建后的文件夹，进去拷贝出FiveChessClient.exe，存放到单独的文件夹中，这里命名为FiveChess</p>
-<p>7、从FiveChessClient文件夹中将config.ini和music文件夹拷贝到FiveChess文件夹中</p>
-<p>8、前往Qt的安装目录 Qt\Qt5.4.0\5.4\msvc2013_64\bin，拷贝出icudt53.dll、icuin53.dll、icuuc53.dll、Qt5Core.dll、Qt5Gui.dll、Qt5Multimedia.dll、Qt5Network.dll、Qt5Widgets.dll到FiveChess中</p>
-<p>9、前往Qt\Qt5.4.0\5.4\msvc2013_64\plugins，拷贝出imageformats、mediaservice、platforms文件夹到FiveChess中</p>
-<p>10、上网下载或从本地找到msvcp120.dll、msvcr120.dll拷贝至FiveChess中</p>
-<p>11、打开FiveChess文件夹中的config.ini文件，修改ip为你刚才部署的服务器的ip地址</p>
-<p>12、运行FiveChessClient.exe即可</p>
-<hr>
-<p>作者 [@FateSolo]<br>2016 年 2月 6日</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/02/06/Five-Chess-Client/" data-id="cj3vkyg29001av6lagv2qkho5" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Five-Chess-Server" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/02/06/Five-Chess-Server/" class="article-date">
-  <time datetime="2016-02-06T06:25:39.000Z" itemprop="datePublished">2016-02-06</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/五子棋/">五子棋</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/02/06/Five-Chess-Server/">网络智能五子棋博弈系统的服务器端说明</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <hr>
-<p>大学生创新项目：网络智能五子棋博弈系统的研究与实现</p>
-<p>项目说明：实现了C/S架构的五子棋游戏，支持双人对弈、人机对弈等功能</p>
-<p>服务器端代码开源：<a href="https://github.com/FateSolo/FiveChessServer" target="_blank" rel="external">https://github.com/FateSolo/FiveChessServer</a></p>
-<p>客户端代码开源：<a href="https://github.com/FateSolo/FiveChessClient" target="_blank" rel="external">https://github.com/FateSolo/FiveChessClient</a></p>
-<p>本篇文章是对服务器端程序的简要说明。</p>
-<h3 id="1-__u9879_u76EE_u5F00_u53D1_u73AF_u5883_uFF1A"><a href="#1-__u9879_u76EE_u5F00_u53D1_u73AF_u5883_uFF1A" class="headerlink" title="1. 项目开发环境："></a>1. 项目开发环境：</h3><ul>
-<li>Ubuntu 14.04.3</li>
-<li>Pycharm 5.0.3</li>
-<li>Python 2.7.6</li>
-<li>G++ 4.8.4</li>
-<li>MySQL 5.5</li>
-</ul>
-<h3 id="2-__u603B_u4F53_u8BF4_u660E_uFF1A"><a href="#2-__u603B_u4F53_u8BF4_u660E_uFF1A" class="headerlink" title="2. 总体说明："></a>2. 总体说明：</h3><ul>
-<li><p>主要使用Python实现后台逻辑功能</p>
-</li>
-<li><p>应用了基于事件驱动的Twisted作为服务器框架</p>
-</li>
-<li><p>与五子棋AI相关的模块则使用C++编写，由G++编译成动态链接库(.so)，Python使用ctypes调用动态库内的函数</p>
-</li>
-<li><p>使用MySQLdb完成对MySQL数据库的操作</p>
-</li>
-</ul>
-<h3 id="3-__u4E94_u5B50_u68CBAI_u76F8_u5173_u6A21_u5757_u8BF4_u660E_uFF1A"><a href="#3-__u4E94_u5B50_u68CBAI_u76F8_u5173_u6A21_u5757_u8BF4_u660E_uFF1A" class="headerlink" title="3. 五子棋AI相关模块说明："></a>3. 五子棋AI相关模块说明：</h3><ul>
-<li><p>核心AI：FiveChessAI.so (负极大值算法 + AlphaBeta剪枝 + 历史启发 + 置换表 + 限制搜索边框)</p>
-</li>
-<li><p>判断胜负：FiveChessRule.so</p>
-</li>
-<li><p>连五威胁评判：ThreatJudgement.so</p>
-</li>
-<li><p>具体源码存放在 FiveChessAI/ 文件夹内</p>
-</li>
-</ul>
-<h3 id="4-__u8FD0_u884C_u73AF_u5883_u90E8_u7F72_uFF1A"><a href="#4-__u8FD0_u884C_u73AF_u5883_u90E8_u7F72_uFF1A" class="headerlink" title="4. 运行环境部署："></a>4. 运行环境部署：</h3><p>这里以Ubuntu Server 14.04为例</p>
-<p>1、首先使用浏览器登录你自己的Github账号，将github.com/FateSolo下的FiveChessServer项目Fork到你自己的账号下(如果可以从其他地方获取到源文件，例如大创光盘，那么请直接从第8步开始)</p>
-<p>2、在Ubuntu的终端下安装git</p>
-<pre><code>$ sudo apt-get install git
-</code></pre><p>3、配置你的git</p>
-<pre><code>$ git config --global user.name &quot;在这里填写你的用户名&quot;
-$ git config --global user.email &quot;在这里填写你的邮箱&quot;
-</code></pre><p>4、在Ubuntu的终端下安装ssh</p>
-<pre><code>$ sudo apt-get install ssh
-</code></pre><p>5、生成密钥</p>
-<pre><code>$ ssh-keygen -t rsa -C &quot;你的邮箱&quot;
-</code></pre><p>6、找到当前路径下的隐藏文件.ssh，复制id_rsa.pub文件中的内容，到Github网页上进入Settings，找到SSH Keys将复制的密钥加入</p>
-<p>7、成功后可以从你的Github中克隆项目到本地了(注意将name替换成你的用户名)</p>
-<pre><code>$ git clone git@github.com:name/FiveChessServer.git
-</code></pre><p>8、安装setuptools</p>
-<pre><code>$ wget &quot;https://pypi.python.org/packages/source/s/setuptools/setuptools-12.0.3.tar.gz#md5=f07e4b0f4c1c9368fcd980d888b29a65&quot; --no-check-certificate
-$ tar -zxvf setuptools-12.0.3.tar.gz
-$ cd setuptools-12.0.3
-$ sudo python setup.py install
-</code></pre><p>9、安装pip</p>
-<pre><code>$ wget &quot;https://pypi.python.org/packages/source/p/pip/pip-1.5.4.tar.gz#md5=834b2904f92d46aaa333267fb1c922bb&quot; --no-check-certificate
-$ tar -xzvf pip-1.5.4.tar.gz
-$ cd pip-1.5.4
-$ sudo python setup.py install
-</code></pre><p>10、安装MySQL</p>
-<pre><code>$ sudo apt-get install mysql-client mysql-server
-</code></pre><p>11、建数据库、表</p>
-<pre><code>$ mysql -u root -p
-mysql&gt; CREATE SCHEMA `FiveChess` DEFAULT CHARACTER SET utf8 ;
-mysql&gt; CREATE TABLE `FiveChess`.`User` (`UserName` VARCHAR(10) NOT NULL,`PassWord` VARCHAR(10) NOT NULL,`NickName` VARCHAR(20) NOT NULL,`Win` INT NULL DEFAULT 0,`Lose` INT NULL DEFAULT 0,`Draw` INT NULL DEFAULT 0,PRIMARY KEY (`UserName`));
-</code></pre><p>12、安装环境依赖</p>
-<pre><code>$ sudo apt-get update
-$ sudo apt-get install gcc libmysqlclient-dev python-dev
-</code></pre><p>13、安装MySQLdb模块</p>
-<pre><code>$ sudo pip install MySQL-Python
-</code></pre><p>14、安装Twisted</p>
-<pre><code>$ sudo pip install twisted
-</code></pre><p>15、以守护进程方式运行FiveChessServer.py</p>
-<pre><code>$ cd FiveChessServer
-$ sudo twistd -y FiveChessServer.py
-</code></pre><p>16、验证是否成功运行(查看是否拥有名为twistd的进程)</p>
-<pre><code>$ ps -e
-</code></pre><hr>
-<p>作者 [@FateSolo]<br>2016 年 2月 6日</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/02/06/Five-Chess-Server/" data-id="cj3vkyg230015v6la1pk8g9v6" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
 
     </footer>
   </div>
@@ -882,7 +835,7 @@ $ sudo twistd -y FiveChessServer.py
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hibernate/">Hibernate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JPA/">JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jdbc/">Jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JdbcTemplate/">JdbcTemplate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logback/">Logback</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZooKeeper/">ZooKeeper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hibernate/">Hibernate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JPA/">JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jdbc/">Jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JdbcTemplate/">JdbcTemplate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logback/">Logback</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZooKeeper/">ZooKeeper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
     </div>
   </div>
 
@@ -892,7 +845,7 @@ $ sudo twistd -y FiveChessServer.py
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Dubbo/" style="font-size: 20px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 16px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 14px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 14px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 18px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 16px;">SpringMVC</a> <a href="/tags/ZooKeeper/" style="font-size: 12px;">ZooKeeper</a> <a href="/tags/五子棋/" style="font-size: 12px;">五子棋</a>
+      <a href="/tags/Dubbo/" style="font-size: 20px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 16px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 14px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 14px;">Mybatis</a> <a href="/tags/Nginx/" style="font-size: 10px;">Nginx</a> <a href="/tags/Spring/" style="font-size: 18px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 16px;">SpringMVC</a> <a href="/tags/ZooKeeper/" style="font-size: 12px;">ZooKeeper</a> <a href="/tags/五子棋/" style="font-size: 12px;">五子棋</a>
     </div>
   </div>
 
@@ -914,6 +867,14 @@ $ sudo twistd -y FiveChessServer.py
       <ul>
         
           <li>
+            <a href="/2017/06/14/Dubbo-Test-8-Redis/">Dubbo-Test-8-Redis</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/05/Dubbo-Test-7-Cluster3/">Dubbo学习笔记 七：Nginx + Tomcat集群</a>
+          </li>
+        
+          <li>
             <a href="/2017/06/04/Dubbo-Test-6-Cluster2/">Dubbo学习笔记 六：ZooKeeper集群</a>
           </li>
         
@@ -923,14 +884,6 @@ $ sudo twistd -y FiveChessServer.py
         
           <li>
             <a href="/2017/06/02/Dubbo-Test-4-RESTful/">Dubbo学习笔记 四：支持RESTful Remoting</a>
-          </li>
-        
-          <li>
-            <a href="/2017/05/31/Dubbo-Test-3-Spring/">Dubbo学习笔记 三：搭建Spring + Dubbo框架</a>
-          </li>
-        
-          <li>
-            <a href="/2017/05/25/Dubbo-Test-2-Gradle/">Dubbo学习笔记 二：使用Gradle构建多module项目</a>
           </li>
         
       </ul>
