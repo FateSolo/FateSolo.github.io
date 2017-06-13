@@ -31,8 +31,8 @@
 
 在本章将测试Dubbo的服务集群功能。
 1. 服务打包将dubbo-server打成jar包，然后用java -jar命令运">
-<meta property="og:image" content="http://yoursite.com/image/dubbo-server-provider.png">
-<meta property="og:updated_time" content="2017-06-13T05:37:13.669Z">
+<meta property="og:image" content="http://yoursite.com/images/dubbo-server-provider.png">
+<meta property="og:updated_time" content="2017-06-13T05:49:02.261Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dubbo学习笔记 五：Dubbo服务集群">
 <meta name="twitter:description" content="项目地址：https://github.com/FateSolo/Dubbo-Test
@@ -147,7 +147,7 @@
 <p>即可在虚拟机运行第一个服务。</p>
 <p>2) 将lib文件夹和jar包拷贝至本机，修改jar包内的dubbo-server.xml，更改注册中心地址：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">dubbo:registry</span> <span class="attribute">address</span>=<span class="value">"zookeeper://192.168.16.151:2181"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
 <p>也就是虚拟机的ip地址，随后可在本机运行此服务。</p>
-<h3 id="3-__u96C6_u7FA4_u6D4B_u8BD5"><a href="#3-__u96C6_u7FA4_u6D4B_u8BD5" class="headerlink" title="3. 集群测试"></a>3. 集群测试</h3><p>1) 在dubbo-admin中，可以看到com.fatesolo.dubbo.api.service.BookService服务此时拥有四个提供者：<br><img src="/image/dubbo-server-provider.png" alt="dubbo-server-provider"></p>
+<h3 id="3-__u96C6_u7FA4_u6D4B_u8BD5"><a href="#3-__u96C6_u7FA4_u6D4B_u8BD5" class="headerlink" title="3. 集群测试"></a>3. 集群测试</h3><p>1) 在dubbo-admin中，可以看到com.fatesolo.dubbo.api.service.BookService服务此时拥有四个提供者：<br><img src="/images/dubbo-server-provider.png" alt="dubbo-server-provider"></p>
 <p>分别是本机和虚拟机的7110端口和20880端口。</p>
 <p>2) 运行dubbo-client。</p>
 <p>3) 使用dubbo-client添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -d &#34;name=Book1&#38;author=Fate&#34; http://localhost:8080/dubbo-client/book</span><br></pre></td></tr></table></figure></p>
@@ -160,7 +160,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/06/03/Dubbo-Test-5-Cluster/" data-id="cj3v546ka001doelabcxr9orb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/06/03/Dubbo-Test-5-Cluster/" data-id="cj3v5dkzz001dtklakqq3gn5g" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li></ul>
