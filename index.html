@@ -66,6 +66,78 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Dubbo-Test-6-Cluster2" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/04/Dubbo-Test-6-Cluster2/" class="article-date">
+  <time datetime="2017-06-04T06:00:24.000Z" itemprop="datePublished">2017-06-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Dubbo系列/">Dubbo系列</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/06/04/Dubbo-Test-6-Cluster2/">Dubbo学习笔记 六：ZooKeeper集群</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<p>项目地址：<br><a href="https://github.com/FateSolo/Dubbo-Test" target="_blank" rel="external">https://github.com/FateSolo/Dubbo-Test</a></p>
+<h3 id="u76EE_u5F55_uFF1A"><a href="#u76EE_u5F55_uFF1A" class="headerlink" title="目录："></a>目录：</h3><ul>
+<li><a href="/2017/05/23/Dubbo-Test-0-Intro/">0. 序</a></li>
+<li><a href="/2017/05/24/Dubbo-Test-1-Maven/">1. Maven构建项目</a></li>
+<li><a href="/2017/05/25/Dubbo-Test-2-Gradle/">2. Gradle构建项目</a></li>
+<li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
+<li><a href="/2017/06/02/Dubbo-Test-4-RESTful/">4. 支持RESTful Remoting</a></li>
+<li><a href="/2017/06/03/Dubbo-Test-5-Cluster/">5. Dubbo服务集群</a></li>
+<li><a href="/2017/06/04/Dubbo-Test-6-Cluster2/">6. ZooKeeper集群</a></li>
+</ul>
+<p>在本章将测试注册中心的集群功能，即ZooKeeper的集群。</p>
+<h3 id="1-__u6587_u4EF6_u914D_u7F6E"><a href="#1-__u6587_u4EF6_u914D_u7F6E" class="headerlink" title="1. 文件配置"></a>1. 文件配置</h3><p>因为资源有限，这里只在虚拟机内配置三个ZooKeeper。</p>
+<p>1) 将ZooKeeper复制为三份，分别命名为zookeeper-1、zookeeper-2、zookeeper-3。</p>
+<p>2) 在三个文件夹内各创建一个data文件夹，并在data文件夹内创建myid文件，myid只包含一个数字，分别是1、2、3。</p>
+<p>3) 分别修改三个ZooKeeper的conf/zoo.cfg：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">tickTime=<span class="number">2000</span></span><br><span class="line">initLimit=<span class="number">10</span></span><br><span class="line">syncLimit=<span class="number">5</span></span><br><span class="line">dataDir=/home/fate/zookeeper-<span class="number">1</span>/data</span><br><span class="line">clientPort=<span class="number">2181</span></span><br><span class="line">server.<span class="number">1</span>=localhost:<span class="number">2887</span>:<span class="number">3887</span></span><br><span class="line">server.<span class="number">2</span>=localhost:<span class="number">2888</span>:<span class="number">3888</span></span><br><span class="line">server.<span class="number">3</span>=localhost:<span class="number">2889</span>:<span class="number">3889</span></span><br></pre></td></tr></table></figure></p>
+<p>其余两个大致相同，不同点如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dataDir=/home/fate/zookeeper-<span class="number">2</span>/data</span><br><span class="line">clientPort=<span class="number">2182</span></span><br><span class="line"></span><br><span class="line">dataDir=/home/fate/zookeeper-<span class="number">3</span>/data</span><br><span class="line">clientPort=<span class="number">2183</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="2-__u8FD0_u884C_u6D4B_u8BD5"><a href="#2-__u8FD0_u884C_u6D4B_u8BD5" class="headerlink" title="2. 运行测试"></a>2. 运行测试</h3><p>1) 键入如下命令启动三个ZooKeeper：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./zookeeper-<span class="number">1</span>/bin/zkServer.sh start</span><br><span class="line">./zookeeper-<span class="number">2</span>/bin/zkServer.sh start</span><br><span class="line">./zookeeper-<span class="number">3</span>/bin/zkServer.sh start</span><br></pre></td></tr></table></figure></p>
+<p>2) 查看jps：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">6193</span> Jps</span><br><span class="line"><span class="number">6115</span> QuorumPeerMain</span><br><span class="line"><span class="number">6085</span> QuorumPeerMain</span><br><span class="line"><span class="number">3687</span> RemoteMavenServer</span><br><span class="line"><span class="number">3579</span> Main</span><br><span class="line"><span class="number">3789</span> Launcher</span><br><span class="line"><span class="number">6159</span> QuorumPeerMain</span><br></pre></td></tr></table></figure></p>
+<p>可以看到已经启动了三个ZooKeeper。</p>
+<p>3) 打开dubbo-admin的dubbo.properties，修改如下配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dubbo.registry.address=zookeeper://127.0.0.1:2181?backup=127.0.0.1:2182,127.0.0.1:2183</span><br></pre></td></tr></table></figure></p>
+<p>4) 启动dubbo-admin，查看系统管理 -&gt; 系统状态，注册中心此时处于正常连接状态。</p>
+<p>5) 停止zookeeper-1：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./zookeeper-<span class="number">1</span>/bin/zkServer.sh stop</span><br></pre></td></tr></table></figure></p>
+<p>此时注册中心仍然处于正常连接状态，集群成功。</p>
+<p>6) 停止zookeeper-2：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./zookeeper-<span class="number">2</span>/bin/zkServer.sh stop</span><br></pre></td></tr></table></figure></p>
+<p>此时注册中心报错，处于未连接状态，因为超过一半机器已宕机。</p>
+<p>7) 重新启动zookeeper-1和zookeeper-2：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./zookeeper-<span class="number">1</span>/bin/zkServer.sh start</span><br><span class="line">./zookeeper-<span class="number">2</span>/bin/zkServer.sh start</span><br></pre></td></tr></table></figure></p>
+<p>注册中心状态已经恢复正常。</p>
+<hr>
+<p>作者 [@FateSolo]<br>2017 年 06月 04日</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/06/04/Dubbo-Test-6-Cluster2/" data-id="cj3vku5nl001dqplar16u2k5i" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ZooKeeper/">ZooKeeper</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Dubbo-Test-5-Cluster" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/06/03/Dubbo-Test-5-Cluster/" class="article-date">
@@ -101,6 +173,7 @@
 <li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
 <li><a href="/2017/06/02/Dubbo-Test-4-RESTful/">4. 支持RESTful Remoting</a></li>
 <li><a href="/2017/06/03/Dubbo-Test-5-Cluster/">5. Dubbo服务集群</a></li>
+<li><a href="/2017/06/04/Dubbo-Test-6-Cluster2/">6. ZooKeeper集群</a></li>
 </ul>
 <p>在本章将测试Dubbo的服务集群功能。</p>
 <h3 id="1-__u670D_u52A1_u6253_u5305"><a href="#1-__u670D_u52A1_u6253_u5305" class="headerlink" title="1. 服务打包"></a>1. 服务打包</h3><p>将dubbo-server打成jar包，然后用java -jar命令运行。</p>
@@ -130,7 +203,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/06/03/Dubbo-Test-5-Cluster/" data-id="cj3v5dkzz001dtklakqq3gn5g" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/06/03/Dubbo-Test-5-Cluster/" data-id="cj3vku5ns001kqpladzql5vcv" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li></ul>
@@ -176,6 +249,8 @@
 <li><a href="/2017/05/25/Dubbo-Test-2-Gradle/">2. Gradle构建项目</a></li>
 <li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
 <li><a href="/2017/06/02/Dubbo-Test-4-RESTful/">4. 支持RESTful Remoting</a></li>
+<li><a href="/2017/06/03/Dubbo-Test-5-Cluster/">5. Dubbo服务集群</a></li>
+<li><a href="/2017/06/04/Dubbo-Test-6-Cluster2/">6. ZooKeeper集群</a></li>
 </ul>
 <p>本章将对dubbo-server进行优化，包括为dubbo协议替换高效二进制序列化实现Kryo和增加RESTful协议（均是当当网维护的Dubbox项目所增加的功能）。</p>
 <h3 id="1-__u66FF_u6362_u5E8F_u5217_u5316_u5B9E_u73B0_uFF1A"><a href="#1-__u66FF_u6362_u5E8F_u5217_u5316_u5B9E_u73B0_uFF1A" class="headerlink" title="1. 替换序列化实现："></a>1. 替换序列化实现：</h3><p>dubbo协议采用单一长连接和NIO异步通讯，是Dubbo框架所推荐的协议，其缺省采用Hessian序列化方式。</p>
@@ -207,7 +282,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/06/02/Dubbo-Test-4-RESTful/" data-id="cj3v5dl09001itkla6gz2c9h2" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/06/02/Dubbo-Test-4-RESTful/" data-id="cj3vku5nx001nqplakh5vabjb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li></ul>
@@ -253,6 +328,8 @@
 <li><a href="/2017/05/25/Dubbo-Test-2-Gradle/">2. Gradle构建项目</a></li>
 <li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
 <li><a href="/2017/06/02/Dubbo-Test-4-RESTful/">4. 支持RESTful Remoting</a></li>
+<li><a href="/2017/06/03/Dubbo-Test-5-Cluster/">5. Dubbo服务集群</a></li>
+<li><a href="/2017/06/04/Dubbo-Test-6-Cluster2/">6. ZooKeeper集群</a></li>
 </ul>
 <p>在本章将继续使用上一章的Gradle项目，搭建一个基于Spring + Dubbo框架的分布式服务。</p>
 <h3 id="1-__u9879_u76EE_u5BFC_u5165_uFF1A"><a href="#1-__u9879_u76EE_u5BFC_u5165_uFF1A" class="headerlink" title="1. 项目导入："></a>1. 项目导入：</h3><p>使用Intellij IDEA作为项目IDE，以提高工作效率。</p>
@@ -296,7 +373,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/31/Dubbo-Test-3-Spring/" data-id="cj3v5dl0f001mtklaskazz9wf" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/31/Dubbo-Test-3-Spring/" data-id="cj3vku5o1001rqpla2y4bh3c8" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
@@ -342,6 +419,8 @@
 <li><a href="/2017/05/25/Dubbo-Test-2-Gradle/">2. Gradle构建项目</a></li>
 <li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
 <li><a href="/2017/06/02/Dubbo-Test-4-RESTful/">4. 支持RESTful Remoting</a></li>
+<li><a href="/2017/06/03/Dubbo-Test-5-Cluster/">5. Dubbo服务集群</a></li>
+<li><a href="/2017/06/04/Dubbo-Test-6-Cluster2/">6. ZooKeeper集群</a></li>
 </ul>
 <p>在本章将用Gradle重新构建多module项目Dubbo-Test，以展示和Maven的区别。</p>
 <h3 id="1-__u9879_u76EE_u521B_u5EFA_uFF1A"><a href="#1-__u9879_u76EE_u521B_u5EFA_uFF1A" class="headerlink" title="1. 项目创建："></a>1. 项目创建：</h3><p>1) 创建名为Dubbo-Test的文件夹并进入：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir Dubbo-Test &#38;&#38; cd Dubbo-Test</span><br></pre></td></tr></table></figure></p>
@@ -366,7 +445,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/25/Dubbo-Test-2-Gradle/" data-id="cj3v5dl0l001qtklat5rph5vz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/25/Dubbo-Test-2-Gradle/" data-id="cj3vku5o8001vqplapp5eqhtr" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gradle/">Gradle</a></li></ul>
@@ -412,6 +491,8 @@
 <li><a href="/2017/05/25/Dubbo-Test-2-Gradle/">2. Gradle构建项目</a></li>
 <li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
 <li><a href="/2017/06/02/Dubbo-Test-4-RESTful/">4. 支持RESTful Remoting</a></li>
+<li><a href="/2017/06/03/Dubbo-Test-5-Cluster/">5. Dubbo服务集群</a></li>
+<li><a href="/2017/06/04/Dubbo-Test-6-Cluster2/">6. ZooKeeper集群</a></li>
 </ul>
 <p>对于一个使用了Dubbo的分布式应用，其可以拆分成三个部分：</p>
 <p>dubbo-api，服务公共api，包含服务接口、实体等server、client公用的类。<br>dubbo-server，服务提供者，实现api的服务接口，提供具体服务。<br>dubbo-client，服务消费者，使用api提供的接口，远程调用server端服务。</p>
@@ -440,7 +521,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/24/Dubbo-Test-1-Maven/" data-id="cj3v5dl1h001vtklajxpsxy8k" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/24/Dubbo-Test-1-Maven/" data-id="cj3vku5oh0020qpla7zy9z0iw" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven/">Maven</a></li></ul>
@@ -486,6 +567,8 @@
 <li><a href="/2017/05/25/Dubbo-Test-2-Gradle/">2. Gradle构建项目</a></li>
 <li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
 <li><a href="/2017/06/02/Dubbo-Test-4-RESTful/">4. 支持RESTful Remoting</a></li>
+<li><a href="/2017/06/03/Dubbo-Test-5-Cluster/">5. Dubbo服务集群</a></li>
+<li><a href="/2017/06/04/Dubbo-Test-6-Cluster2/">6. ZooKeeper集群</a></li>
 </ul>
 <p>Dubbo是一个分布式服务框架，致力于提供高性能和透明化的RPC远程服务调用方案，是阿里巴巴SOA服务化治理方案的核心框架，但目前已经停止更新。</p>
 <p>Dubbox，是当当网基于Dubbo开发的框架，支持REST风格远程调用、基于Kryo和FST的Java高效序列化实现等功能。</p>
@@ -510,10 +593,10 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/23/Dubbo-Test-0-Intro/" data-id="cj3v5dl1r0020tklaites8stn" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/23/Dubbo-Test-0-Intro/" data-id="cj3vku5om0025qplakc3tb5qm" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ZooKeeper/">ZooKeeper</a></li></ul>
 
     </footer>
   </div>
@@ -595,7 +678,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-3-Other/" data-id="cj3v5dkyz000ktklaoamt10dg" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-3-Other/" data-id="cj3vku5ms000kqplajopkd1kj" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Logback/">Logback</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li></ul>
@@ -666,7 +749,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-2-Spring/" data-id="cj3v5dkza000utklaq853xzed" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-2-Spring/" data-id="cj3vku5n1000uqpla65zeeche" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li></ul>
@@ -742,79 +825,10 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-1-Jersey/" data-id="cj3v5dkzh0011tklaop54x29g" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/22/JSH-Test-1-Jersey/" data-id="cj3vku5n60011qplah5x8n0yc" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jersey/">Jersey</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-DAO-Test-6-SpringDataJPA" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/03/12/DAO-Test-6-SpringDataJPA/" class="article-date">
-  <time datetime="2017-03-12T15:30:06.000Z" itemprop="datePublished">2017-03-12</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/DAO系列/">DAO系列</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/12/DAO-Test-6-SpringDataJPA/">DAO层实现示例 六：Spring-Data-JPA</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <hr>
-<p>项目地址：<br><a href="https://github.com/FateSolo/DAO-Test" target="_blank" rel="external">https://github.com/FateSolo/DAO-Test</a></p>
-<h3 id="u76EE_u5F55_uFF1A"><a href="#u76EE_u5F55_uFF1A" class="headerlink" title="目录："></a>目录：</h3><ul>
-<li><a href="/2017/03/12/DAO-Test-0-Intro/">0. 项目搭建</a></li>
-<li><a href="/2017/03/12/DAO-Test-1-Jdbc/">1. 原生Jdbc</a></li>
-<li><a href="/2017/03/12/DAO-Test-2-JdbcTemplate/">2. JdbcTemplate</a></li>
-<li><a href="/2017/03/12/DAO-Test-3-Mybatis/">3. Mybatis</a></li>
-<li><a href="/2017/03/12/DAO-Test-4-Hibernate/">4. Hibernate</a></li>
-<li><a href="/2017/03/12/DAO-Test-5-JPA/">5. JPA</a></li>
-<li><a href="/2017/03/12/DAO-Test-6-SpringDataJPA/">6. Spring-Data-JPA</a></li>
-</ul>
-<p>该系列文章将展示六种不同的DAO层实现方法并总结其不同，本章使用Spring-Data-JPA完成DAO操作。</p>
-<h3 id="1-__u793A_u4F8B_u4EE3_u7801_uFF1A"><a href="#1-__u793A_u4F8B_u4EE3_u7801_uFF1A" class="headerlink" title="1. 示例代码："></a>1. 示例代码：</h3><p>1) 在spring-common.xml中，配置Spring-Data-JPA：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- Spring Data JPA --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">jpa:repositories</span> <span class="attribute">base-package</span>=<span class="value">"com.fatesolo.dao.impl"</span></span><br><span class="line">                  <span class="attribute">transaction-manager-ref</span>=<span class="value">"transactionManager"</span></span><br><span class="line">                  <span class="attribute">entity-manager-factory-ref</span>=<span class="value">"entityManagerFactory"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>在文件开头的beans标签内添加一个xmlns：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xmlns:jpa="http://www.springframework.org/schema/data/jpa"</span><br></pre></td></tr></table></figure></p>
-<p>在xsi:schemaLocation中添加：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://www.springframework.org/schema/data/jpa</span><br><span class="line">http://www.springframework.org/schema/data/jpa/spring-jpa.xsd</span><br></pre></td></tr></table></figure></p>
-<p>2) 在build.gradle中，添加Spring-Data-JPA依赖：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">compile &#39;org.springframework.data:spring-data-jpa:1.11.1.RELEASE&#39;</span><br></pre></td></tr></table></figure></p>
-<p>3) 在dao.impl包中创建BookDaoSpringDataJpaImpl.java，编写如下代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.fatesolo.dao.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.fatesolo.dao.BookDao;</span><br><span class="line"><span class="keyword">import</span> com.fatesolo.entity.Book;</span><br><span class="line"><span class="keyword">import</span> org.springframework.data.repository.RepositoryDefinition;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Repository;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@Repository</span>(<span class="string">"bookDaoSpringDataJpaImpl"</span>)</span><br><span class="line"><span class="annotation">@RepositoryDefinition</span>(domainClass = Book.class, idClass = Integer.class)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BookDaoSpringDataJpaImpl</span> <span class="keyword">extends</span> <span class="title">BookDao</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>4) 打开BookService.java，修改成员变量bookDao的注解：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@Resource</span>(name = <span class="string">"bookDaoSpringDataJpaImpl"</span>)</span><br></pre></td></tr></table></figure></p>
-<h3 id="2-__u9879_u76EE_u8FD0_u884C_uFF1A"><a href="#2-__u9879_u76EE_u8FD0_u884C_uFF1A" class="headerlink" title="2. 项目运行："></a>2. 项目运行：</h3><p>1) 使用Tomcat 8运行项目，使用curl工具添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -d &#34;name=Test6&#38;author=Fate&#34; http://localhost:8080/book</span><br></pre></td></tr></table></figure></p>
-<p>得到如下返回：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book&#123;id=6, name=&#39;Test6&#39;, author=&#39;Fate&#39;&#125;</span><br></pre></td></tr></table></figure></p>
-<p>2) 访问<a href="http://localhost:8080/book/6" target="_blank" rel="external">http://localhost:8080/book/6</a> ，得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book&#123;id=6, name=&#39;Test6&#39;, author=&#39;Fate&#39;&#125;</span><br></pre></td></tr></table></figure></p>
-<p>3) 访问<a href="http://localhost:8080/book/name/Test" target="_blank" rel="external">http://localhost:8080/book/name/Test</a> ，得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Book&#123;id=1, name=&#39;Test1&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=2, name=&#39;Test2&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=3, name=&#39;Test3&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=4, name=&#39;Test4&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=5, name=&#39;Test5&#39;, author=&#39;Fate&#39;&#125;, Book&#123;id=6, name=&#39;Test6&#39;, author=&#39;Fate&#39;&#125;]</span><br></pre></td></tr></table></figure></p>
-<h3 id="3-__u603B_u7ED3"><a href="#3-__u603B_u7ED3" class="headerlink" title="3. 总结"></a>3. 总结</h3><p>就像Spring的JdbcTemplate是对原生Jdbc的封装，Spring-Data-JPA也是Spring对JPA的封装。</p>
-<p>可以看到，Spring-Data-JPA已经做到了简化的极致，开发者无需实现任何逻辑代码和sql语句，仅仅继承了BookDao接口并添加了@RepositoryDefinition注解 (或者继承org.springframework.data.repository.Repository及其子接口)，就完成了DAO的操作。</p>
-<p>Spring-Data-JPA是根据声明方法的命名来自动实现逻辑代码的，findById、findByNameContaining、save等都符合了其命名规则，开发者无需再自行实现。关于具体的命名规则，请参阅<a href="http://docs.spring.io/spring-data/jpa/docs/1.11.1.RELEASE/reference/html/#repository-query-keywords" target="_blank" rel="external">Spring官方文档</a>。</p>
-<hr>
-<p>作者 [@FateSolo]<br>2017 年 03月 12日</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/12/DAO-Test-6-SpringDataJPA/" data-id="cj3v5dl210023tklaw31aw83p" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li></ul>
 
     </footer>
   </div>
@@ -846,7 +860,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hibernate/">Hibernate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JPA/">JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jdbc/">Jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JdbcTemplate/">JdbcTemplate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logback/">Logback</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hibernate/">Hibernate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JPA/">JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jdbc/">Jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JdbcTemplate/">JdbcTemplate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logback/">Logback</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZooKeeper/">ZooKeeper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
     </div>
   </div>
 
@@ -856,7 +870,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Dubbo/" style="font-size: 20px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 16px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 14px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 14px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 18px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 16px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 12px;">五子棋</a>
+      <a href="/tags/Dubbo/" style="font-size: 20px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 16px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 14px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 14px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 18px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 16px;">SpringMVC</a> <a href="/tags/ZooKeeper/" style="font-size: 12px;">ZooKeeper</a> <a href="/tags/五子棋/" style="font-size: 12px;">五子棋</a>
     </div>
   </div>
 
@@ -878,6 +892,10 @@
       <ul>
         
           <li>
+            <a href="/2017/06/04/Dubbo-Test-6-Cluster2/">Dubbo学习笔记 六：ZooKeeper集群</a>
+          </li>
+        
+          <li>
             <a href="/2017/06/03/Dubbo-Test-5-Cluster/">Dubbo学习笔记 五：Dubbo服务集群</a>
           </li>
         
@@ -891,10 +909,6 @@
         
           <li>
             <a href="/2017/05/25/Dubbo-Test-2-Gradle/">Dubbo学习笔记 二：使用Gradle构建多module项目</a>
-          </li>
-        
-          <li>
-            <a href="/2017/05/24/Dubbo-Test-1-Maven/">Dubbo学习笔记 一：使用Maven构建多module项目</a>
           </li>
         
       </ul>

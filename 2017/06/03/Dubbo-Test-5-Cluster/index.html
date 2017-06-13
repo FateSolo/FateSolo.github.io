@@ -13,9 +13,10 @@
 3. 搭建Spring + Dubbo框架
 4. 支持RESTful Remoting
 5. Dubbo服务集群
+6. ZooKeeper集群
 
 在本章将测试Dubbo的服务集群功能。
-1. 服务打包将dubbo-server打成jar包，然后用java -jar命令运">
+1. 服务打包将dubbo-server打成jar包，">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Dubbo学习笔记 五：Dubbo服务集群">
 <meta property="og:url" content="http://yoursite.com/2017/06/03/Dubbo-Test-5-Cluster/index.html">
@@ -28,11 +29,12 @@
 3. 搭建Spring + Dubbo框架
 4. 支持RESTful Remoting
 5. Dubbo服务集群
+6. ZooKeeper集群
 
 在本章将测试Dubbo的服务集群功能。
-1. 服务打包将dubbo-server打成jar包，然后用java -jar命令运">
+1. 服务打包将dubbo-server打成jar包，">
 <meta property="og:image" content="http://yoursite.com/images/dubbo-server-provider.png">
-<meta property="og:updated_time" content="2017-06-13T05:49:02.261Z">
+<meta property="og:updated_time" content="2017-06-13T13:01:02.580Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dubbo学习笔记 五：Dubbo服务集群">
 <meta name="twitter:description" content="项目地址：https://github.com/FateSolo/Dubbo-Test
@@ -43,9 +45,10 @@
 3. 搭建Spring + Dubbo框架
 4. 支持RESTful Remoting
 5. Dubbo服务集群
+6. ZooKeeper集群
 
 在本章将测试Dubbo的服务集群功能。
-1. 服务打包将dubbo-server打成jar包，然后用java -jar命令运">
+1. 服务打包将dubbo-server打成jar包，">
   
     <link rel="alternate" href="/atom.xml" title="Fate Solo" type="application/atom+xml">
   
@@ -131,6 +134,7 @@
 <li><a href="/2017/05/31/Dubbo-Test-3-Spring/">3. 搭建Spring + Dubbo框架</a></li>
 <li><a href="/2017/06/02/Dubbo-Test-4-RESTful/">4. 支持RESTful Remoting</a></li>
 <li><a href="/2017/06/03/Dubbo-Test-5-Cluster/">5. Dubbo服务集群</a></li>
+<li><a href="/2017/06/04/Dubbo-Test-6-Cluster2/">6. ZooKeeper集群</a></li>
 </ul>
 <p>在本章将测试Dubbo的服务集群功能。</p>
 <h3 id="1-__u670D_u52A1_u6253_u5305"><a href="#1-__u670D_u52A1_u6253_u5305" class="headerlink" title="1. 服务打包"></a>1. 服务打包</h3><p>将dubbo-server打成jar包，然后用java -jar命令运行。</p>
@@ -160,7 +164,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/06/03/Dubbo-Test-5-Cluster/" data-id="cj3v5dkzz001dtklakqq3gn5g" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/06/03/Dubbo-Test-5-Cluster/" data-id="cj3vku5ns001kqpladzql5vcv" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li></ul>
@@ -170,6 +174,15 @@
   
     
 <nav id="article-nav">
+  
+    <a href="/2017/06/04/Dubbo-Test-6-Cluster2/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Dubbo学习笔记 六：ZooKeeper集群
+        
+      </div>
+    </a>
   
   
     <a href="/2017/06/02/Dubbo-Test-4-RESTful/" id="article-nav-older" class="article-nav-link-wrap">
@@ -200,7 +213,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hibernate/">Hibernate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JPA/">JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jdbc/">Jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JdbcTemplate/">JdbcTemplate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logback/">Logback</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dubbo/">Dubbo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hibernate/">Hibernate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JAX-RS/">JAX-RS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JPA/">JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jdbc/">Jdbc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JdbcTemplate/">JdbcTemplate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jersey/">Jersey</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logback/">Logback</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mybatis/">Mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Data-JPA/">Spring-Data-JPA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZooKeeper/">ZooKeeper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/五子棋/">五子棋</a></li></ul>
     </div>
   </div>
 
@@ -210,7 +223,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Dubbo/" style="font-size: 20px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 16px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 14px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 14px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 18px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 16px;">SpringMVC</a> <a href="/tags/五子棋/" style="font-size: 12px;">五子棋</a>
+      <a href="/tags/Dubbo/" style="font-size: 20px;">Dubbo</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/Hibernate/" style="font-size: 10px;">Hibernate</a> <a href="/tags/JAX-RS/" style="font-size: 16px;">JAX-RS</a> <a href="/tags/JPA/" style="font-size: 10px;">JPA</a> <a href="/tags/Jdbc/" style="font-size: 10px;">Jdbc</a> <a href="/tags/JdbcTemplate/" style="font-size: 10px;">JdbcTemplate</a> <a href="/tags/Jersey/" style="font-size: 14px;">Jersey</a> <a href="/tags/Logback/" style="font-size: 10px;">Logback</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/Mybatis/" style="font-size: 14px;">Mybatis</a> <a href="/tags/Spring/" style="font-size: 18px;">Spring</a> <a href="/tags/Spring-Data-JPA/" style="font-size: 12px;">Spring-Data-JPA</a> <a href="/tags/SpringMVC/" style="font-size: 16px;">SpringMVC</a> <a href="/tags/ZooKeeper/" style="font-size: 12px;">ZooKeeper</a> <a href="/tags/五子棋/" style="font-size: 12px;">五子棋</a>
     </div>
   </div>
 
@@ -232,6 +245,10 @@
       <ul>
         
           <li>
+            <a href="/2017/06/04/Dubbo-Test-6-Cluster2/">Dubbo学习笔记 六：ZooKeeper集群</a>
+          </li>
+        
+          <li>
             <a href="/2017/06/03/Dubbo-Test-5-Cluster/">Dubbo学习笔记 五：Dubbo服务集群</a>
           </li>
         
@@ -245,10 +262,6 @@
         
           <li>
             <a href="/2017/05/25/Dubbo-Test-2-Gradle/">Dubbo学习笔记 二：使用Gradle构建多module项目</a>
-          </li>
-        
-          <li>
-            <a href="/2017/05/24/Dubbo-Test-1-Maven/">Dubbo学习笔记 一：使用Maven构建多module项目</a>
           </li>
         
       </ul>
