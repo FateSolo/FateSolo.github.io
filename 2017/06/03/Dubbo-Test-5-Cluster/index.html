@@ -31,7 +31,8 @@
 
 在本章将测试Dubbo的服务集群功能。
 1. 服务打包将dubbo-server打成jar包，然后用java -jar命令运">
-<meta property="og:updated_time" content="2017-06-12T15:26:52.824Z">
+<meta property="og:image" content="http://yoursite.com/image/dubbo-server-provider.png">
+<meta property="og:updated_time" content="2017-06-13T05:37:13.669Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dubbo学习笔记 五：Dubbo服务集群">
 <meta name="twitter:description" content="项目地址：https://github.com/FateSolo/Dubbo-Test
@@ -135,20 +136,22 @@
 <h3 id="1-__u670D_u52A1_u6253_u5305"><a href="#1-__u670D_u52A1_u6253_u5305" class="headerlink" title="1. 服务打包"></a>1. 服务打包</h3><p>将dubbo-server打成jar包，然后用java -jar命令运行。</p>
 <p>1) 打开dubbo-server下的build.gradle，增加如下代码：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">task copyLib(<span class="string">type :</span> Copy) &#123;</span><br><span class="line">    from &#123; configurations.compile &#125;</span><br><span class="line">    into(<span class="string">'lib'</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">jar &#123;</span><br><span class="line">    manifest &#123;</span><br><span class="line">        attributes <span class="string">'Main-Class'</span>: <span class="string">'com.fatesolo.dubbo.server.service.impl.BookServiceImpl'</span></span><br><span class="line">        attributes <span class="string">'Class-Path'</span>: <span class="keyword">new</span> File(<span class="string">'lib'</span>).list().findAll &#123;</span><br><span class="line">            it.endsWith(<span class="string">'.jar'</span>)</span><br><span class="line">        &#125;.collect &#123; <span class="string">"lib/$it"</span> &#125;.join(<span class="string">' '</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>copyLib负责将dubbo-server的所有依赖拷贝至lib文件夹下，attributes ‘Main-Class’指定jar包运行入口，attributes ‘Class-Path’指定jar包的所有依赖，即lib文件夹下的所有jar包。</p>
-<p>2) 打开dubbo-server.xml，注释掉dubbo协议（此时服务使用的是rest协议）。</p>
+<p>2) 打开dubbo-server.xml，修改服务配置如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">dubbo:service</span> <span class="attribute">interface</span>=<span class="value">"com.fatesolo.dubbo.api.service.BookService"</span></span><br><span class="line">               <span class="attribute">ref</span>=<span class="value">"bookServiceImpl"</span> <span class="attribute">protocol</span>=<span class="value">"dubbo,rest"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>即让该服务同时使用dubbo和rest协议。</p>
 <p>3) 进入到dubbo-server目录下，键入如下命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gradle copyLib</span><br></pre></td></tr></table></figure></p>
 <p>在dubbo-server文件夹下已经生成了lib文件夹。</p>
 <p>4) 继续键入如下命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gradle build</span><br></pre></td></tr></table></figure></p>
 <p>在dubbo-server/build/libs文件夹下已经生成了dubbo-server-1.0-SNAPSHOT.jar。</p>
-<h3 id="2-__u670D_u52A1_u90E8_u7F72"><a href="#2-__u670D_u52A1_u90E8_u7F72" class="headerlink" title="2. 服务部署"></a>2. 服务部署</h3><p>因为资源有限，这里只在一台机器内同时运行两个服务。</p>
+<h3 id="2-__u670D_u52A1_u90E8_u7F72"><a href="#2-__u670D_u52A1_u90E8_u7F72" class="headerlink" title="2. 服务部署"></a>2. 服务部署</h3><p>因为资源有限，这里只在虚拟机和本机同时运行两个服务。</p>
 <p>1) 将lib文件夹和jar包放至同一个目录，键入如下命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar dubbo-server-<span class="number">1.0</span>-SNAPSHOT.jar</span><br></pre></td></tr></table></figure></p>
-<p>即可运行第一个服务。</p>
-<p>2) 此时服务端口已被占用，修改jar包内的dubbo-server.xml，更改协议端口：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">dubbo:protocol</span> <span class="attribute">name</span>=<span class="value">"dubbo"</span> <span class="attribute">port</span>=<span class="value">"20880"</span> <span class="attribute">serialization</span>=<span class="value">"kryo"</span></span><br><span class="line">                <span class="attribute">optimizer</span>=<span class="value">"com.fatesolo.dubbo.api.serialization.SerializationOptimizerImpl"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--&lt;dubbo:protocol name="rest" port="7110" server="tomcat" contextpath="dubbo-server"/&gt;--&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">dubbo:service</span> <span class="attribute">interface</span>=<span class="value">"com.fatesolo.dubbo.api.service.BookService"</span></span><br><span class="line">               <span class="attribute">ref</span>=<span class="value">"bookServiceImpl"</span> <span class="attribute">protocol</span>=<span class="value">"dubbo"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>即使用dubbo协议，注释掉rest协议，然后便可以运行第二个服务。</p>
-<h3 id="3-__u96C6_u7FA4_u6D4B_u8BD5"><a href="#3-__u96C6_u7FA4_u6D4B_u8BD5" class="headerlink" title="3. 集群测试"></a>3. 集群测试</h3><p>在dubbo-admin中，可以看到20880端口和7110端口同时提供了com.fatesolo.dubbo.api.service.BookService服务。</p>
-<p>1) 运行dubbo-client。</p>
-<p>2) 使用dubbo-client添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -d &#34;name=Book1&#38;author=Fate&#34; http://localhost:8080/dubbo-client/book</span><br></pre></td></tr></table></figure></p>
-<p>3) 连续访问<a href="http://localhost:8080/dubbo-client/book" target="_blank" rel="external">http://localhost:8080/dubbo-client/book</a> ，将随机得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[&#123;&#34;id&#34;:1,&#34;name&#34;:&#34;Book1&#34;,&#34;author&#34;:&#34;Fate&#34;&#125;]</span><br></pre></td></tr></table></figure></p>
+<p>即可在虚拟机运行第一个服务。</p>
+<p>2) 将lib文件夹和jar包拷贝至本机，修改jar包内的dubbo-server.xml，更改注册中心地址：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">dubbo:registry</span> <span class="attribute">address</span>=<span class="value">"zookeeper://192.168.16.151:2181"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>也就是虚拟机的ip地址，随后可在本机运行此服务。</p>
+<h3 id="3-__u96C6_u7FA4_u6D4B_u8BD5"><a href="#3-__u96C6_u7FA4_u6D4B_u8BD5" class="headerlink" title="3. 集群测试"></a>3. 集群测试</h3><p>1) 在dubbo-admin中，可以看到com.fatesolo.dubbo.api.service.BookService服务此时拥有四个提供者：<br><img src="/image/dubbo-server-provider.png" alt="dubbo-server-provider"></p>
+<p>分别是本机和虚拟机的7110端口和20880端口。</p>
+<p>2) 运行dubbo-client。</p>
+<p>3) 使用dubbo-client添加一条数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -d &#34;name=Book1&#38;author=Fate&#34; http://localhost:8080/dubbo-client/book</span><br></pre></td></tr></table></figure></p>
+<p>4) 连续访问<a href="http://localhost:8080/dubbo-client/book" target="_blank" rel="external">http://localhost:8080/dubbo-client/book</a> ，将随机得到如下结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[&#123;&#34;id&#34;:1,&#34;name&#34;:&#34;Book1&#34;,&#34;author&#34;:&#34;Fate&#34;&#125;]</span><br></pre></td></tr></table></figure></p>
 <p>或者<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[]</span><br></pre></td></tr></table></figure></p>
 <p>会出现这种情况，是因为Dubbo的负载均衡策略缺省为random随机调用。因此添加数据被随机添加到了其中一个服务中，访问同样是随机访问其中一个服务。</p>
 <hr>
@@ -157,7 +160,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/06/03/Dubbo-Test-5-Cluster/" data-id="cj3ualfo2001dgtlais4pha5d" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/06/03/Dubbo-Test-5-Cluster/" data-id="cj3v546ka001doelabcxr9orb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dubbo/">Dubbo</a></li></ul>
